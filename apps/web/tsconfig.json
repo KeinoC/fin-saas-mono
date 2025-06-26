@@ -36,6 +36,9 @@
       "config": [
         "../../packages/config"
       ],
+      "database": [
+        "../../packages/database"
+      ],
       "ui": [
         "../../packages/ui"
       ]

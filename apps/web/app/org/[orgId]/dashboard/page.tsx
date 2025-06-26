@@ -9,7 +9,6 @@ import {
   TrendingUp, 
   Users, 
   CreditCard, 
-  Settings,
   Plus,
   ArrowUpRight,
   DollarSign
@@ -105,10 +104,6 @@ function DashboardContent({ orgId }: { orgId: string }) {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="bg-white border-2 border-gray-600 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                <Settings className="w-4 h-4" />
-                Settings
-              </button>
               <button className="bg-yellow-700 text-white px-4 py-2 rounded-md hover:bg-yellow-800 transition-colors flex items-center gap-2">
                 <Plus className="w-4 h-4" />
                 Add Integration
@@ -208,7 +203,7 @@ function DashboardContent({ orgId }: { orgId: string }) {
 
         {/* Organization Info */}
         <div className="mt-8 bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Organization Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Organization Overview</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2">
@@ -223,10 +218,6 @@ function DashboardContent({ orgId }: { orgId: string }) {
                 <span className="text-sm text-gray-600">Role</span>
                 <span className="text-sm font-medium capitalize">{currentOrg.userRole}</span>
               </div>
-              <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-                <Settings className="w-4 h-4" />
-                Manage Settings
-              </button>
             </div>
           </div>
         </div>

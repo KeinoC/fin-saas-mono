@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@components/layout/navbar";
-import { Sidebar } from "@components/layout/sidebar";
+import { ConditionalLayout } from "@components/layout/conditional-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,15 +25,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 h-full`}
       >
         <Navbar />
-        <Sidebar />
-        <main className="pt-16 lg:pl-64">
+        <ConditionalLayout>
           {children}
-        </main>
+        </ConditionalLayout>
       </body>
     </html>
   );

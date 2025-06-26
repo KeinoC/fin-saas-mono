@@ -1,5 +1,4 @@
 import { ComingSoon } from '@components/layout/coming-soon';
-import { Users } from 'lucide-react';
 
 interface TeamPageProps {
   params: Promise<{ orgId: string }>;
@@ -13,7 +12,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
       title="Team"
       description="Manage team members, set permissions, send invitations, and control access to your organization's financial data."
       orgId={orgId}
-      icon={Users}
+      icon="team"
     />
   );
 } 

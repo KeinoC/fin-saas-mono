@@ -9,7 +9,8 @@ import {
   CreditCard,
   FileBarChart,
   Users,
-  Home
+  Home,
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,6 +34,12 @@ export function Sidebar() {
       href: `/org/${currentOrg.id}/integrations`,
       icon: CreditCard,
       current: pathname === `/org/${currentOrg.id}/integrations`,
+    },
+    {
+      name: 'Data Uploads',
+      href: `/org/${currentOrg.id}/data/uploads`,
+      icon: Upload,
+      current: pathname.startsWith(`/org/${currentOrg.id}/data`),
     },
     {
       name: 'Budgets',

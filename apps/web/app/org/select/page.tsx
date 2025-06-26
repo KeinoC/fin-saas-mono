@@ -130,7 +130,7 @@ export default function OrgSelectPage() {
 
   if (isPending || isLoadingOrgs) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-700 mx-auto mb-4"></div>
           <p className="text-gray-600">
@@ -148,7 +148,7 @@ export default function OrgSelectPage() {
 
   if (organizations.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <Building2 className="w-16 h-16 mx-auto text-gray-400 mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to K-Fin</h1>
@@ -185,7 +185,7 @@ export default function OrgSelectPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Select Organization</h1>

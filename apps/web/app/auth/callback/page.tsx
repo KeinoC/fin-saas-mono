@@ -2,26 +2,21 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from 'config';
+import { authClient } from '@lib/auth-client';
 import { useAppStore } from '@lib/stores/app-store';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const { setUser, setOrganizations, setLoading } = useAppStore();
+  const { setUser, setOrganizations, setCurrentOrganization, setLoading } = useAppStore();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       setLoading(true);
       
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // Get session from better-auth
+        const session = await authClient.getSession();
         
-        if (error) {
-          console.error('Auth callback error:', error);
-          router.push('/auth/login?error=callback_error');
-          return;
-        }
-
         if (!session?.user) {
           router.push('/auth/login');
           return;
@@ -30,57 +25,38 @@ export default function AuthCallbackPage() {
         // Set user in store
         setUser({
           id: session.user.id,
-          email: session.user.email!,
-          name: session.user.user_metadata?.name || session.user.user_metadata?.full_name,
+          email: session.user.email,
+          name: session.user.name,
         });
 
-        // Fetch user's organizations
-        const { data: orgUsers, error: orgError } = await supabase
-          .from('org_users')
-          .select(`
-            role,
-            orgs (
-              id,
-              name,
-              subscription_plan,
-              currency
-            )
-          `)
-          .eq('user_id', session.user.id);
-
-        if (orgError) {
-          console.error('Error fetching organizations:', orgError);
-        } else if (orgUsers && orgUsers.length > 0) {
-          const organizations = orgUsers.map((ou: any) => ({
-            id: ou.orgs.id,
-            name: ou.orgs.name,
-            subscriptionPlan: ou.orgs.subscription_plan,
-            currency: ou.orgs.currency,
-            userRole: ou.role,
-          }));
-          
+        // Get user's organizations from better-auth
+        const organizations = await authClient.organization.list();
+        
+        if (organizations && organizations.length > 0) {
           setOrganizations(organizations);
           
-          // If user has only one org, auto-select it
+          // If user has only one org, auto-select it and redirect to dashboard
           if (organizations.length === 1) {
+            setCurrentOrganization(organizations[0]);
             router.push(`/org/${organizations[0].id}/dashboard`);
           } else {
+            // Multiple orgs - let user choose
             router.push('/org/select');
           }
         } else {
-          // No organizations found - redirect to onboarding or org creation
-          router.push('/onboarding');
+          // No organizations - redirect to org creation
+          router.push('/org/create');
         }
       } catch (error) {
-        console.error('Unexpected error in auth callback:', error);
-        router.push('/auth/login?error=unexpected_error');
+        console.error('Error in auth callback:', error);
+        router.push('/auth/login?error=callback_error');
       } finally {
         setLoading(false);
       }
     };
 
     handleAuthCallback();
-  }, [router, setUser, setOrganizations, setLoading]);
+  }, [router, setUser, setOrganizations, setCurrentOrganization, setLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

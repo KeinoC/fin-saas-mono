@@ -1,0 +1,39 @@
+# Terraform Variables for GitHub Secrets
+# Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars to version control!
+
+# GitHub Configuration
+github_token      = "ghp_your_github_personal_access_token"
+repository_owner  = "your-github-username"
+repository_name   = "k-fin"
+
+# Testing & Coverage
+codecov_token       = "your_codecov_token_here"
+cypress_record_key  = "your_cypress_record_key_here"
+
+# Deployment (Vercel)
+vercel_token      = "your_vercel_token_here"
+vercel_org_id     = "your_vercel_org_id_here"
+vercel_project_id = "your_vercel_project_id_here"
+
+# Notifications
+slack_webhook_url = "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+
+# Database & Services
+database_url                    = "postgresql://user:password@host:port/database"
+supabase_url                   = "https://your-project.supabase.co"
+supabase_anon_key              = "your_supabase_anon_key"
+supabase_service_role_key      = "your_supabase_service_role_key"
+
+# OAuth & Integrations
+google_client_id     = "your_google_client_id.apps.googleusercontent.com"
+google_client_secret = "your_google_client_secret"
+plaid_client_id      = "your_plaid_client_id"
+plaid_secret         = "your_plaid_secret_key"
+
+# Optional Integrations
+stripe_secret_key      = "sk_live_your_stripe_secret_key"
+stripe_webhook_secret  = "whsec_your_stripe_webhook_secret"
+sendgrid_api_key       = "SG.your_sendgrid_api_key"
+twilio_account_sid     = "your_twilio_account_sid"
+twilio_auth_token      = "your_twilio_auth_token" 

@@ -1,79 +1,71 @@
-import { supabase } from 'config';
+import type { NotificationMethod, Frequency } from 'database';
 
 export interface ReportSubscription {
   id?: string;
   userId: string;
   reportType: string;
-  method: 'email' | 'sms';
-  frequency: 'daily' | 'weekly' | 'monthly';
-  nextRunAt: string;
-  lastRunAt?: string;
+  method: NotificationMethod;
+  frequency: Frequency;
+  nextRunAt: Date;
+  lastRunAt?: Date;
 }
 
 export class ReportService {
   static async createSubscription(subscription: ReportSubscription) {
-    const { data, error } = await supabase
-      .from('report_subscriptions')
-      .insert({
-        user_id: subscription.userId,
-        report_type: subscription.reportType,
+    const { prisma } = await import('database');
+    
+    return await prisma.reportSubscription.create({
+      data: {
+        userId: subscription.userId,
+        reportType: subscription.reportType,
         method: subscription.method,
         frequency: subscription.frequency,
-        next_run_at: subscription.nextRunAt,
-        last_run_at: subscription.lastRunAt,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+        nextRunAt: subscription.nextRunAt,
+        lastRunAt: subscription.lastRunAt,
+      },
+    });
   }
 
   static async getSubscriptions(userId: string) {
-    const { data, error } = await supabase
-      .from('report_subscriptions')
-      .select('*')
-      .eq('user_id', userId);
-
-    if (error) throw error;
-    return data;
+    const { prisma } = await import('database');
+    
+    return await prisma.reportSubscription.findMany({
+      where: { userId },
+    });
   }
 
   static async updateSubscription(id: string, updates: Partial<ReportSubscription>) {
-    const { data, error } = await supabase
-      .from('report_subscriptions')
-      .update({
-        report_type: updates.reportType,
+    const { prisma } = await import('database');
+    
+    return await prisma.reportSubscription.update({
+      where: { id },
+      data: {
+        reportType: updates.reportType,
         method: updates.method,
         frequency: updates.frequency,
-        next_run_at: updates.nextRunAt,
-        last_run_at: updates.lastRunAt,
-      })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+        nextRunAt: updates.nextRunAt,
+        lastRunAt: updates.lastRunAt,
+      },
+    });
   }
 
   static async deleteSubscription(id: string) {
-    const { error } = await supabase
-      .from('report_subscriptions')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    const { prisma } = await import('database');
+    
+    await prisma.reportSubscription.delete({
+      where: { id },
+    });
   }
 
   static async getDueReports() {
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from('report_subscriptions')
-      .select('*')
-      .lte('next_run_at', now);
-
-    if (error) throw error;
-    return data;
+    const { prisma } = await import('database');
+    
+    return await prisma.reportSubscription.findMany({
+      where: {
+        nextRunAt: {
+          lte: new Date(),
+        },
+      },
+    });
   }
 } 

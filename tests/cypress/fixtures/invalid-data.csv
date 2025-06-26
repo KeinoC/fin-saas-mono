@@ -1,0 +1,6 @@
+Account Name,Category,Amount,Date,Description
+Checking Account,Income,not-a-number,2024-01-01,Invalid amount
+Credit Card,Expense,-250.00,invalid-date,Invalid date
+,Expense,-150.00,2024-01-04,Missing account name
+Savings Account,,1000.00,2024-01-03,Missing category
+Checking Account,Expense,-75.50,2024-01-05,Valid row 

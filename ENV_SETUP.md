@@ -109,6 +109,15 @@ TWILIO_PHONE_NUMBER=your-twilio-phone-number
 ### 🔐 Security & App Configuration
 ```bash
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Encryption key for storing sensitive data (Google credentials, tokens)
+ENCRYPTION_KEY=your-32-character-hex-encryption-key-here
+```
+
+**Generate an encryption key:**
+```bash
+# Generate a secure encryption key
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 ## Quick Start (Minimum Required)

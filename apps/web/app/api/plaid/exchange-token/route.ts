@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createPlaidClient } from 'integrations/plaid';
-import { supabase } from 'config';
+import { DatabaseService } from 'database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,18 +20,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(result);
     }
 
-    // Store the access token in the database
-    const { error } = await supabase
-      .from('accounts')
-      .upsert({
-        org_id: orgId,
-        source: 'plaid',
-        access_token: result.accessToken,
-        last_synced_at: new Date().toISOString(),
-      });
-
-    if (error) {
-      console.error('Database error:', error);
+    try {
+      // Store the access token in the database
+      const existingAccount = await DatabaseService.getAccount(orgId, 'plaid');
+      
+      if (existingAccount) {
+        await DatabaseService.updateAccount(existingAccount.id, {
+          accessToken: result.accessToken,
+          lastSyncedAt: new Date(),
+        });
+      } else {
+        await DatabaseService.createAccount({
+          orgId,
+          source: 'plaid',
+          accessToken: result.accessToken,
+          lastSyncedAt: new Date(),
+        });
+      }
+    } catch (dbError) {
+      console.error('Database error:', dbError);
       return NextResponse.json(
         { success: false, error: 'Failed to store account data' },
         { status: 500 }

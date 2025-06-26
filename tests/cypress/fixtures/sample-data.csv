@@ -1,0 +1,6 @@
+Account Name,Category,Amount,Date,Description
+Checking Account,Income,5000.00,2024-01-01,Salary
+Credit Card,Expense,-250.00,2024-01-02,Groceries
+Savings Account,Transfer,1000.00,2024-01-03,Monthly savings
+Checking Account,Expense,-150.00,2024-01-04,Utilities
+Checking Account,Expense,-75.50,2024-01-05,Gas 

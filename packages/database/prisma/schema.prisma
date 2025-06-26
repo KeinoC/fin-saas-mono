@@ -1,0 +1,288 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id               String   @id @default(uuid())
+  name             String
+  subscriptionPlan String   @default("free") @map("subscription_plan")
+  currency         String   @default("USD")
+  apiKey           String   @unique @default(uuid()) @map("api_key")
+  rateLimit        Int      @default(1000) @map("rate_limit")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Relations
+  orgUsers         OrganizationUser[]
+  scenarios        Scenario[]
+  budgets          Budget[]
+  accounts         Account[]
+  dataImports      DataImport[]
+  notifications    Notification[]
+  dashboards       Dashboard[]
+  auditLogs        AuditLog[]
+  invitations      Invitation[]
+  googleIntegrations GoogleIntegration[]
+
+  @@map("orgs")
+}
+
+model OrganizationUser {
+  userId String @map("user_id")
+  orgId  String @map("org_id")
+  role   Role
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@id([userId, orgId])
+  @@map("org_users")
+}
+
+model Profile {
+  id           String  @id
+  isSuperadmin Boolean @default(false) @map("is_superadmin")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Scenario {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  name      String
+  data      Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  // Relations
+  organization     Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  scenarioVersions ScenarioVersion[]
+
+  @@map("scenarios")
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  name      String
+  data      Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("budgets")
+}
+
+model Account {
+  id            String    @id @default(uuid())
+  orgId         String    @map("org_id")
+  source        IntegrationSource
+  accessToken   String?   @map("access_token")
+  refreshToken  String?   @map("refresh_token")
+  expiresAt     DateTime? @map("expires_at")
+  lastSyncedAt  DateTime? @map("last_synced_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, source])
+  @@map("accounts")
+}
+
+model DataImport {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  fileType  FileType @map("file_type")
+  data      Json     @default("{}")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("data_imports")
+}
+
+model ScenarioVersion {
+  id         String   @id @default(uuid())
+  scenarioId String   @map("scenario_id")
+  orgId      String   @map("org_id")
+  version    Int
+  data       Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@unique([scenarioId, version])
+  @@map("scenario_versions")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  userId    String   @map("user_id")
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Dashboard {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  userId    String   @map("user_id")
+  config    Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("dashboards")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  orgId     String   @map("org_id")
+  userId    String?  @map("user_id")
+  action    String
+  details   Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+model Invitation {
+  id         String    @id @default(uuid())
+  orgId      String    @map("org_id")
+  email      String
+  role       Role
+  token      String    @unique @default(uuid())
+  createdAt  DateTime  @default(now()) @map("created_at")
+  expiresAt  DateTime  @default(dbgenerated("(NOW() + INTERVAL '7 days')")) @map("expires_at")
+  acceptedAt DateTime? @map("accepted_at")
+  createdBy  String?   @map("created_by")
+
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@map("invitations")
+}
+
+model NotificationPreference {
+  userId    String            @map("user_id")
+  eventType String            @map("event_type")
+  method    NotificationMethod
+  enabled   Boolean           @default(true)
+
+  @@id([userId, eventType, method])
+  @@map("notification_preferences")
+}
+
+model ReportSubscription {
+  id         String            @id @default(uuid())
+  userId     String            @map("user_id")
+  reportType String            @map("report_type")
+  method     NotificationMethod
+  frequency  Frequency
+  nextRunAt  DateTime          @map("next_run_at")
+  lastRunAt  DateTime?         @map("last_run_at")
+  createdAt  DateTime          @default(now()) @map("created_at")
+
+  @@map("report_subscriptions")
+}
+
+model Plan {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  features  Json     @default("{}")
+  price     Decimal  @default(0) @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("plans")
+}
+
+model GoogleIntegration {
+  id           String   @id @default(cuid())
+  orgId        String
+  userId       String?  // Optional for service accounts
+  authMethod   String   // 'oauth' or 'service_account'
+  name         String   // User-friendly name for the integration
+  email        String   // Google account email or service account email
+  
+  // OAuth-specific fields
+  accessToken  String?  @db.Text
+  refreshToken String?  @db.Text
+  scope        String?
+  tokenType    String?
+  expiryDate   DateTime?
+  
+  // Service Account-specific fields (stored as encrypted JSON)
+  credentials  String?  @db.Text // Encrypted JSON for service account credentials
+  
+  // Common fields
+  scopes       String[] // Array of scopes/permissions
+  isActive     Boolean  @default(true)
+  lastUsedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  @@unique([orgId, email, authMethod])
+  @@map("google_integrations")
+}
+
+// Enums
+enum Role {
+  admin
+  editor
+  viewer
+}
+
+enum IntegrationSource {
+  plaid
+  quickbooks
+  rippling
+  adp
+  acuity
+  mindbody
+}
+
+enum FileType {
+  csv
+  excel
+}
+
+enum NotificationMethod {
+  email
+  in_app
+  sms
+}
+
+enum Frequency {
+  daily
+  weekly
+  monthly
+} 
