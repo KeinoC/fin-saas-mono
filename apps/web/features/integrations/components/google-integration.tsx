@@ -208,7 +208,7 @@ export function GoogleIntegration({ integrations, onRefresh, isAdmin = false }: 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
             <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -234,20 +234,20 @@ export function GoogleIntegration({ integrations, onRefresh, isAdmin = false }: 
               onClick={() => setShowServiceAccount(!showServiceAccount)}
               className="flex items-center gap-2 cursor-pointer"
             >
-              <Settings className="w-4 h-4" />
+                <Settings className="w-4 h-4" />
               {showServiceAccount ? 'Hide Advanced' : 'Show Advanced'}
             </Button>
           )}
         </div>
       </div>
-      
+          
       {/* Main OAuth Section */}
       <Card>
         <CardHeader>
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-yellow-600" />
-            </div>
+              </div>
             <div className="flex-1">
               <CardTitle className="text-lg text-gray-800">Quick Connect with OAuth</CardTitle>
               <CardDescription className="text-gray-600">
@@ -257,19 +257,19 @@ export function GoogleIntegration({ integrations, onRefresh, isAdmin = false }: 
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
-            onClick={handleOAuthConnect} 
-            disabled={isConnecting}
+            <Button 
+              onClick={handleOAuthConnect} 
+              disabled={isConnecting}
             className="w-full bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer"
             size="lg"
-          >
-            {isConnecting ? (
-              <>
+            >
+              {isConnecting ? (
+                <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Connecting to Google...
-              </>
-            ) : (
-              <>
+                </>
+              ) : (
+                <>
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -277,13 +277,13 @@ export function GoogleIntegration({ integrations, onRefresh, isAdmin = false }: 
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 Connect with Google
-              </>
-            )}
-          </Button>
+                </>
+              )}
+            </Button>
 
           {/* Connected Integrations */}
           {integrations.length > 0 && (
-            <div className="space-y-3">
+              <div className="space-y-3">
               <h4 className="font-medium text-gray-800">Connected Accounts</h4>
               <div className="space-y-2">
                 {integrations.map((integration) => (
@@ -295,8 +295,8 @@ export function GoogleIntegration({ integrations, onRefresh, isAdmin = false }: 
                   />
                 ))}
               </div>
-            </div>
-          )}
+              </div>
+            )}
         </CardContent>
       </Card>
 
@@ -319,19 +319,19 @@ export function GoogleIntegration({ integrations, onRefresh, isAdmin = false }: 
           <CardContent>
             <form onSubmit={handleServiceAccountSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="sa-name">Integration Name</Label>
-                  <Input
-                    id="sa-name"
-                    value={serviceAccountForm.name}
-                    onChange={(e) => setServiceAccountForm(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="e.g., K-Fin Production Service Account"
-                    required
-                  />
-                </div>
-                <div>
+              <div>
+                <Label htmlFor="sa-name">Integration Name</Label>
+                <Input
+                  id="sa-name"
+                  value={serviceAccountForm.name}
+                  onChange={(e) => setServiceAccountForm(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="e.g., K-Fin Production Service Account"
+                  required
+                />
+              </div>
+              <div>
                   <Label htmlFor="sa-project">Google Cloud Project ID</Label>
-                  <Input
+                    <Input
                     id="sa-project"
                     value={serviceAccountForm.projectId}
                     onChange={(e) => setServiceAccountForm(prev => ({ ...prev, projectId: e.target.value }))}
@@ -414,11 +414,11 @@ Your private key content here...
               )}
 
               <div className="flex gap-3 pt-4 border-t">
-                <Button 
-                  type="submit" 
+              <Button 
+                type="submit" 
                   disabled={isSubmittingServiceAccount || !serviceAccountForm.name || !serviceAccountForm.projectId || !serviceAccountForm.clientEmail || !serviceAccountForm.privateKey}
                   className="flex-1 cursor-pointer"
-                >
+              >
                 {isSubmittingServiceAccount ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -440,7 +440,7 @@ Your private key content here...
                 Cancel
               </Button>
             </div>
-          </form>
+            </form>
         </CardContent>
       </Card>
       )}
@@ -452,7 +452,7 @@ Your private key content here...
             <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
               <Info className="w-4 h-4 text-yellow-600" />
             </div>
-            <div className="flex-1">
+                    <div className="flex-1">
               <h4 className="font-medium text-yellow-900 mb-2">Need Help?</h4>
               <div className="text-sm text-yellow-700 space-y-2">
                 <p>• <strong>OAuth:</strong> Quick setup for individual use. Uses your personal Google account.</p>
@@ -480,8 +480,8 @@ Your private key content here...
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+       </CardContent>
+     </Card>
     </div>
    );
  }
@@ -525,20 +525,20 @@ function IntegrationCard({
         <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
           <CheckCircle className="w-5 h-5 text-green-600" />
         </div>
-        <div className="flex-1">
+      <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="font-medium text-gray-800">{integration.name}</span>
-            <Badge variant="secondary" className="text-xs flex items-center gap-1">
-              {getAuthMethodIcon(integration.authMethod)}
-              {getAuthMethodDisplay(integration.authMethod)}
-            </Badge>
-          </div>
+          <Badge variant="secondary" className="text-xs flex items-center gap-1">
+            {getAuthMethodIcon(integration.authMethod)}
+            {getAuthMethodDisplay(integration.authMethod)}
+          </Badge>
+        </div>
           <p className="text-sm text-gray-700 mb-1">
-            {integration.email}
-          </p>
+          {integration.email}
+        </p>
           <p className="text-xs text-gray-600">
             {getScopeDescription(integration.scopes)}
-          </p>
+        </p>
         </div>
       </div>
       

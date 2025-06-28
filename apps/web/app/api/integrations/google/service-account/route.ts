@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { googleAPIService, GoogleServiceAccountCredentials } from '@lib/services/google-api';
-import { authLocal as auth } from '@lib/auth-local';
+import { auth } from '@lib/auth';
 import { googleIntegrationsService } from 'database/lib/google-integrations-service';
 
 export async function POST(request: NextRequest) {

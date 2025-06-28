@@ -14,9 +14,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (result.error) {
+    // Check if result has user data
+    if (!result.user) {
       return NextResponse.json(
-        { error: result.error.message },
+        { error: 'Failed to create user' },
         { status: 400 }
       );
     }
@@ -25,9 +26,9 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'User created successfully',
       user: {
-        id: result.data?.user?.id,
-        email: result.data?.user?.email,
-        name: result.data?.user?.name,
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
       },
     });
   } catch (error) {

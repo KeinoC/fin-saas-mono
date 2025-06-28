@@ -44,7 +44,7 @@ export const useAppStore = create<AppStore>()(
     (set, get) => ({
       // Initial state
       user: null,
-      isLoading: true,
+      isLoading: false,
       currentOrg: null,
       organizations: [],
       

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@components/layout/navbar";
 import { ConditionalLayout } from "@components/layout/conditional-layout";
+import { ToastProviderWrapper } from "@components/ui/toast-provider-wrapper";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,14 +27,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 h-full`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground h-full transition-colors`}
       >
-        <Navbar />
-        <ConditionalLayout>
-          {children}
-        </ConditionalLayout>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+      >
+        <ToastProviderWrapper>
+          <Navbar />
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
+        </ToastProviderWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -134,14 +134,7 @@ export async function POST(request: NextRequest) {
         let result = Papa.parse(text, {
           header: true,
           skipEmptyLines: true,
-          delimiter: '',  // Auto-detect delimiter
-          newline: '',    // Auto-detect newline
-          quoteChar: '"',
-          escapeChar: '"',
-          transformHeader: (header) => header.trim(),
-          transform: (value) => value.trim(),
           dynamicTyping: false, // Keep as strings for now
-          skipFirstNLines: 0,
           fastMode: false,  // Disable fast mode for better error handling
           comments: false,  // Don't treat any lines as comments
         });
@@ -161,12 +154,9 @@ export async function POST(request: NextRequest) {
             delimiter: ',',  // Force comma
             quoteChar: '"',
             escapeChar: '"',
-            transformHeader: (header) => header.trim(),
-            transform: (value) => value ? value.trim() : '',
             dynamicTyping: false,
             fastMode: false,
             comments: false,
-            skipLinesWithError: true,  // Skip problematic lines
           });
           
           console.log('Papa parse result (lenient comma):', {
@@ -185,12 +175,9 @@ export async function POST(request: NextRequest) {
             delimiter: ',',
             quoteChar: '',  // Disable quote handling
             escapeChar: '',
-            transformHeader: (header) => header.trim(),
-            transform: (value) => value ? value.trim() : '',
             dynamicTyping: false,
             fastMode: false,
             comments: false,
-            skipLinesWithError: true,
           });
           
           console.log('Papa parse result (no quotes):', {
@@ -209,12 +196,9 @@ export async function POST(request: NextRequest) {
             delimiter: ';',
             quoteChar: '',  // Disable quote handling
             escapeChar: '',
-            transformHeader: (header) => header.trim(),
-            transform: (value) => value ? value.trim() : '',
             dynamicTyping: false,
             fastMode: false,
             comments: false,
-            skipLinesWithError: true,
           });
           
           console.log('Papa parse result (semicolon, no quotes):', {
@@ -233,12 +217,9 @@ export async function POST(request: NextRequest) {
             delimiter: '\t',
             quoteChar: '',  // Disable quote handling
             escapeChar: '',
-            transformHeader: (header) => header.trim(),
-            transform: (value) => value ? value.trim() : '',
             dynamicTyping: false,
             fastMode: false,
             comments: false,
-            skipLinesWithError: true,
           });
           
           console.log('Papa parse result (tab, no quotes):', {
@@ -269,7 +250,7 @@ export async function POST(request: NextRequest) {
 
         // Filter out completely empty rows
         parsedData = result.data.filter(row => {
-          return Object.values(row).some(value => value && String(value).trim() !== '');
+          return Object.values(row as any).some(value => value && String(value).trim() !== '');
         });
         fileType = 'csv';
       } else if (isExcel) {
@@ -493,6 +474,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// Export the in-memory storage for access by the imports endpoint
-export { inMemoryImports }; 

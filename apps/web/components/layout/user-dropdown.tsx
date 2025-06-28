@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@lib/stores/app-store';
 import { useSession, signOut } from '@lib/auth-client';
 import { useRouter } from 'next/navigation';
@@ -13,18 +12,31 @@ import {
   Check
 } from 'lucide-react';
 import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useState, useEffect } from 'react';
 
 export function UserDropdown() {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const { currentOrg, organizations, switchOrganization } = useAppStore();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const user = session?.user;
 
+  // Ensure client-side hydration is complete
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   const handleLogout = async () => {
-    setIsOpen(false);
     await signOut();
     router.push('/auth/login');
   };
@@ -34,125 +46,114 @@ export function UserDropdown() {
       switchOrganization(orgId);
       router.push(`/org/${orgId}/dashboard`);
     }
-    setIsOpen(false);
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
 
-  if (!user) return null;
+  // Don't render anything while hydrating, session is loading, or if no user
+  if (!isHydrated || isPending || !user) return null;
+
+  const userInitials = user.name 
+    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() 
+    : user.email?.charAt(0).toUpperCase() || 'U';
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      {/* User Card Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-      >
-        <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-          <User className="w-4 h-4 text-yellow-700" />
-        </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+        <Avatar className="w-8 h-8">
+          <AvatarImage src={user.image || undefined} alt={user.name || user.email || 'User'} />
+          <AvatarFallback className="bg-yellow-100 text-yellow-700 text-sm font-medium">
+            {userInitials}
+          </AvatarFallback>
+        </Avatar>
         <div className="hidden md:block text-left">
-          <p className="text-sm font-medium text-gray-800">
+          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
             {user.name || user.email?.split('@')[0]}
           </p>
-          <p className="text-xs text-gray-600">{user.email}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">{user.email}</p>
         </div>
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+        <ChevronDown className="w-4 h-4 text-gray-400 transition-transform" />
+      </DropdownMenuTrigger>
 
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+      <DropdownMenuContent className="w-80" align="end">
           {/* User Info Section */}
-          <div className="px-4 py-3 border-b border-gray-100">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-yellow-700" />
-              </div>
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={user.image || undefined} alt={user.name || user.email || 'User'} />
+              <AvatarFallback className="bg-yellow-100 text-yellow-700 text-lg font-medium">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
               <div>
-                <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {user.name || user.email?.split('@')[0]}
                 </p>
-                <p className="text-xs text-gray-600">{user.email}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{user.email}</p>
               </div>
             </div>
           </div>
 
           {/* Organization Switching Section */}
           {organizations.length > 1 && (
-            <div className="py-2 border-b border-gray-100">
-              <div className="px-4 py-2">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+          <>
+            <DropdownMenuLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                   Switch Organization
-                </p>
-              </div>
+            </DropdownMenuLabel>
               <div className="max-h-32 overflow-y-auto">
                 {organizations.map((org) => (
-                  <button
+                <DropdownMenuItem
                     key={org.id}
                     onClick={() => handleOrgSwitch(org.id)}
-                    className="w-full flex items-center justify-between px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between cursor-pointer"
                   >
                     <div className="flex items-center space-x-2">
                       <Building2 className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700">{org.name}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{org.name}</span>
                     </div>
                     {currentOrg?.id === org.id && (
                       <Check className="w-4 h-4 text-yellow-600" />
                     )}
-                  </button>
+                </DropdownMenuItem>
                 ))}
-              </div>
             </div>
+            <DropdownMenuSeparator />
+          </>
           )}
 
           {/* Menu Options */}
-          <div className="py-2">
-            {/* Profile Option */}
+        <DropdownMenuItem asChild>
             <Link
               href="/profile"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            className="flex items-center space-x-2 cursor-pointer"
             >
               <User className="w-4 h-4 text-gray-400" />
               <span>Profile</span>
             </Link>
+        </DropdownMenuItem>
 
             {/* Settings Option (only for admins) */}
             {currentOrg && currentOrg.userRole === 'admin' && (
+          <DropdownMenuItem asChild>
               <Link
                 href={`/org/${currentOrg.id}/settings`}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 cursor-pointer"
               >
                 <Settings className="w-4 h-4 text-gray-400" />
                 <span>Organization Settings</span>
               </Link>
+          </DropdownMenuItem>
             )}
 
+        <DropdownMenuSeparator />
+
             {/* Logout Option */}
-            <button
+        <DropdownMenuItem
               onClick={handleLogout}
-              className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center space-x-2 cursor-pointer text-red-600 dark:text-red-400"
             >
-              <LogOut className="w-4 h-4 text-gray-400" />
+          <LogOut className="w-4 h-4" />
               <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 } 

@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Organization {
@@ -83,14 +84,16 @@ model Budget {
 }
 
 model Account {
-  id            String    @id @default(uuid())
-  orgId         String    @map("org_id")
-  source        IntegrationSource
-  accessToken   String?   @map("access_token")
-  refreshToken  String?   @map("refresh_token")
-  expiresAt     DateTime? @map("expires_at")
-  lastSyncedAt  DateTime? @map("last_synced_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
+  id                 String    @id @default(uuid())
+  orgId              String    @map("org_id")
+  source             IntegrationSource
+  externalAccountId  String?   @map("external_account_id")  // Acuity User ID, Plaid account ID, etc.
+  displayName        String?   @map("display_name")         // User-friendly name for the integration
+  accessToken        String?   @map("access_token")
+  refreshToken       String?   @map("refresh_token")
+  expiresAt          DateTime? @map("expires_at")
+  lastSyncedAt       DateTime? @map("last_synced_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
 
   // Relations
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -256,6 +259,7 @@ model GoogleIntegration {
 
 // Enums
 enum Role {
+  owner
   admin
   editor
   viewer

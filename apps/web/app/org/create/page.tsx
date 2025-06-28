@@ -40,10 +40,10 @@ export default function CreateOrgPage() {
       const result = await authClient.organization.create({
         name: formData.name.trim(),
         slug: formData.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-        metadata: JSON.stringify({
+        metadata: {
           subscriptionPlan: formData.plan,
           currency: formData.currency,
-        })
+        }
       });
 
       if (result.error) {
@@ -51,12 +51,18 @@ export default function CreateOrgPage() {
       }
 
       // Transform the better-auth organization to our app format
+      // The structure might be result.data.organization or just result.data
+      const organization = result.data?.organization || result.data;
+      if (!organization || !organization.id) {
+        throw new Error('Invalid organization data returned from server');
+      }
+
       const newOrg = {
-        id: result.data.organization.id,
-        name: result.data.organization.name,
+        id: organization.id,
+        name: organization.name,
         subscriptionPlan: formData.plan,
         currency: formData.currency,
-        userRole: 'admin' as const,
+        userRole: 'admin' as const, // Match the creatorRole we set in auth config
       };
 
       // Update the store
@@ -64,7 +70,7 @@ export default function CreateOrgPage() {
       setOrganizations(updatedOrgs);
       setCurrentOrg(newOrg);
 
-      // Redirect to dashboard
+      // Navigate to dashboard
       router.push(`/org/${newOrg.id}/dashboard`);
     } catch (error: any) {
       console.error('Organization creation error:', error);

@@ -1,6 +1,6 @@
 import { createAuthClient } from "better-auth/react";
 import { organizationClient } from "better-auth/client/plugins";
-import type { SessionLocal } from "./auth-local";
+import type { Session as AuthSession } from "./auth";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NODE_ENV === "production" 
@@ -19,4 +19,4 @@ export const {
   getSession,
 } = authClient;
 
-export type Session = SessionLocal; 
+export type Session = AuthSession; 

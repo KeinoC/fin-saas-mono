@@ -1,4 +1,4 @@
-import { prisma } from '../client';
+import { prisma } from './client';
 import { GoogleIntegration } from '@prisma/client';
 import { encrypt, decrypt } from './encryption';
 

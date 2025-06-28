@@ -22,7 +22,7 @@ export async function GET() {
       return NextResponse.json({ 
         success: true, 
         message: "SQLite database initialized successfully",
-        tables: tables.map(t => t.name)
+        tables: tables.map(t => (t as any).name)
       });
     } else {
       return NextResponse.json({ 

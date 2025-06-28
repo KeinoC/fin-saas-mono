@@ -28,10 +28,10 @@ function getInMemoryStorage() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const dataImport = await DatabaseService.getDataImport(id);
     
@@ -78,8 +78,20 @@ export async function PATCH(
     const DatabaseService = await getDatabaseService();
     if (DatabaseService) {
       try {
+        // Get current data import to preserve existing metadata
+        const currentImport = await DatabaseService.getDataImport(importId);
+        if (!currentImport) {
+          return NextResponse.json(
+            { success: false, error: 'Import not found' },
+            { status: 404 }
+          );
+        }
+
         const updatedImport = await DatabaseService.updateDataImport(importId, {
-          filename: filename.trim()
+          metadata: {
+            ...(currentImport.metadata as object || {}),
+            originalFilename: filename.trim()
+          }
         });
         if (updatedImport) {
           updated = true;

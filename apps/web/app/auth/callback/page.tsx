@@ -4,10 +4,17 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@lib/auth-client';
 import { useAppStore } from '@lib/stores/app-store';
+import { Organization } from 'better-auth/plugins';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const { setUser, setOrganizations, setCurrentOrganization, setLoading } = useAppStore();
+  const { setUser, setOrganizations, setCurrentOrg, setLoading } = useAppStore();
+
+  interface OrganizationWithMetadata extends Organization {
+    subscriptionPlan: string;
+    currency: string;
+    userRole: string;
+  }
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -15,12 +22,14 @@ export default function AuthCallbackPage() {
       
       try {
         // Get session from better-auth
-        const session = await authClient.getSession();
+        const sessionResponse = await authClient.getSession();
         
-        if (!session?.user) {
+        if (!sessionResponse?.data?.user) {
           router.push('/auth/login');
           return;
         }
+
+        const session = sessionResponse.data;
 
         // Set user in store
         setUser({
@@ -30,14 +39,15 @@ export default function AuthCallbackPage() {
         });
 
         // Get user's organizations from better-auth
-        const organizations = await authClient.organization.list();
+        const organizationsResponse = await authClient.organization.list();
+        const organizations = organizationsResponse?.data || [];
         
         if (organizations && organizations.length > 0) {
           setOrganizations(organizations);
           
           // If user has only one org, auto-select it and redirect to dashboard
           if (organizations.length === 1) {
-            setCurrentOrganization(organizations[0]);
+            setCurrentOrg(organizations[0]);
             router.push(`/org/${organizations[0].id}/dashboard`);
           } else {
             // Multiple orgs - let user choose
@@ -56,7 +66,7 @@ export default function AuthCallbackPage() {
     };
 
     handleAuthCallback();
-  }, [router, setUser, setOrganizations, setCurrentOrganization, setLoading]);
+  }, [router, setUser, setOrganizations, setCurrentOrg, setLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

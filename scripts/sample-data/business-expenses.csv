@@ -1,0 +1,16 @@
+Date,Description,Amount,Category,Department,Vendor
+2024-03-01,Office Rent,-2500.00,Operating Expense,Operations,Property Management Co
+2024-03-02,Google Workspace,-15.00,Software,IT,Google
+2024-03-03,Client Payment,5000.00,Revenue,Sales,ABC Corporation
+2024-03-04,Marketing Campaign,-750.00,Marketing,Marketing,Facebook Ads
+2024-03-05,Office Supplies,-89.99,Operating Expense,Operations,Staples
+2024-03-06,Business Lunch,-67.89,Meals & Entertainment,Sales,Local Restaurant
+2024-03-07,Software License,-199.00,Software,IT,Adobe
+2024-03-08,Consulting Fee,1500.00,Revenue,Consulting,XYZ Company
+2024-03-09,Travel Expenses,-456.78,Travel,Business Development,Airline
+2024-03-10,Internet Service,-89.99,Utilities,Operations,Comcast
+2024-03-11,Equipment Purchase,-1200.00,Equipment,IT,Dell
+2024-03-12,Professional Services,-300.00,Professional Services,Finance,Accounting Firm
+2024-03-13,Insurance Premium,-245.00,Insurance,Operations,Business Insurance Co
+2024-03-14,Client Retainer,2000.00,Revenue,Sales,DEF Industries
+2024-03-15,Bank Fees,-25.00,Bank Fees,Finance,Chase Bank 

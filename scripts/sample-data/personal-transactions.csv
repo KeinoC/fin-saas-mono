@@ -1,0 +1,16 @@
+Date,Description,Amount,Category,Account
+2024-03-01,Salary Deposit,4500.00,Income,Checking Account
+2024-03-02,Grocery Store,-89.45,Food,Credit Card
+2024-03-03,Electric Bill,-145.67,Utilities,Checking Account
+2024-03-04,Gas Station,-52.30,Transportation,Credit Card
+2024-03-05,Coffee Shop,-4.85,Food,Credit Card
+2024-03-06,ATM Withdrawal,-100.00,Cash,Checking Account
+2024-03-07,Online Shopping,-67.99,Shopping,Credit Card
+2024-03-08,Restaurant,-34.56,Food,Credit Card
+2024-03-09,Gym Membership,-39.99,Health,Checking Account
+2024-03-10,Interest Earned,2.45,Income,Savings Account
+2024-03-11,Spotify Subscription,-9.99,Entertainment,Credit Card
+2024-03-12,Uber Ride,-18.75,Transportation,Credit Card
+2024-03-13,Pharmacy,-23.40,Health,Credit Card
+2024-03-14,Freelance Payment,350.00,Income,Checking Account
+2024-03-15,Rent Payment,-1200.00,Housing,Checking Account 

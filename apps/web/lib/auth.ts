@@ -1,28 +1,48 @@
 import { betterAuth } from "better-auth";
-import { Pool } from "pg";
+import { organization } from "better-auth/plugins";
+import Database from "better-sqlite3";
+import path from "path";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 5000,
-  idleTimeoutMillis: 30000,
-  max: 10,
-});
+const dbPath = path.join(process.cwd(), "k-fin-dev.db");
+const db = new Database(dbPath);
 
 export const auth = betterAuth({
-  database: pool,
+  database: db,
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.NODE_ENV === "production" 
     ? process.env.NEXT_PUBLIC_APP_URL 
     : "http://localhost:3000",
+  advanced: {
+    database: {
+      generateId: () => crypto.randomUUID(),
+    },
+  },
+  plugins: [
+    organization({
+      allowUserToCreateOrganization: true,
+      organizationLimit: 5,
+      creatorRole: "admin", 
+      membershipLimit: 100,
+      invitationExpiresIn: 60 * 60 * 24 * 7, // 7 days
+    })
+  ],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
+    minPasswordLength: 6,
+    maxPasswordLength: 128,
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      prompt: "select_account",
+      scope: [
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive.file"
+      ],
     },
   },
   session: {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { googleIntegrationsStore } from '@lib/stores/google-integrations-store';
-import { authLocal as auth } from '@lib/auth-local';
+import { auth } from '@lib/auth';
 
 export async function POST(request: NextRequest) {
   try {

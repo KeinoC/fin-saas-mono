@@ -27,7 +27,11 @@
     "db:reset": "supabase db reset",
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
-    "db:studio": "turbo run db:studio"
+    "db:studio": "turbo run db:studio",
+    "db:init": "npx tsx scripts/init-sqlite.ts",
+    "db:seed": "npx tsx scripts/seed-development.ts",
+    "db:test-connection": "npx tsx scripts/test-seed-connection.ts",
+    "dev:setup": "npx tsx scripts/setup-dev-environment.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -49,6 +53,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "tailwindcss": "^4",
+    "tsx": "^4.0.0",
     "turbo": "^2.0.0",
     "typescript": "^5"
   }
