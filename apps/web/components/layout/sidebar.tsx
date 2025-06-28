@@ -22,6 +22,18 @@ import {
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
+// Define types for navigation items
+type NavItem = {
+  name: string;
+  href?: string;
+  icon: any;
+  current: boolean;
+  badge?: string;
+  expandable?: boolean;
+  expanded?: boolean;
+  children?: NavItem[];
+};
+
 export function Sidebar() {
   const { currentOrg } = useAppStore();
   const pathname = usePathname();
@@ -39,7 +51,7 @@ export function Sidebar() {
     );
   };
 
-  const navigation = [
+  const navigation: NavItem[] = [
     {
       name: 'Dashboard',
       href: `/org/${currentOrg.id}/dashboard`,
@@ -61,16 +73,15 @@ export function Sidebar() {
       children: [
         {
           name: 'Connections',
-      href: `/org/${currentOrg.id}/data/uploads`,
-      icon: Upload,
-      current: pathname.startsWith(`/org/${currentOrg.id}/data`),
+          href: `/org/${currentOrg.id}/data/uploads`,
+          icon: Upload,
+          current: pathname.startsWith(`/org/${currentOrg.id}/data/uploads`),
         },
         {
-          name: 'Rules',
-          href: `/org/${currentOrg.id}/data/rules`,
+          name: 'Categories',
+          href: `/org/${currentOrg.id}/data/categories`,
           icon: GitBranch,
-          current: pathname.startsWith(`/org/${currentOrg.id}/data/rules`),
-          badge: 'Coming Soon',
+          current: pathname.startsWith(`/org/${currentOrg.id}/data/categories`),
         },
       ],
     },
@@ -102,6 +113,12 @@ export function Sidebar() {
       current: pathname === `/org/${currentOrg.id}/team`,
       badge: 'Coming Soon',
     },
+    {
+      name: 'Settings',
+      href: `/org/${currentOrg.id}/settings`,
+      icon: Settings,
+      current: pathname.startsWith(`/org/${currentOrg.id}/settings`),
+    }
   ];
 
   return (
@@ -123,13 +140,13 @@ export function Sidebar() {
                   onClick={() => toggleExpanded(item.name.toLowerCase())}
                   className={`group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                     item.current
-                      ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
                 >
                   <Icon 
                     className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                      item.current ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                      item.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
                     }`} 
                   />
                   <span className="flex-1 text-left">{item.name}</span>
@@ -147,25 +164,25 @@ export function Sidebar() {
                       return (
                         <div key={child.name} className="flex items-center">
                           {child.badge ? (
-                            <div className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                            <div className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground/50 cursor-not-allowed">
                               <ChildIcon className="mr-3 flex-shrink-0 h-4 w-4" />
                               <span className="flex-1">{child.name}</span>
-                              <Badge variant="secondary" className="ml-2 text-xs">
+                              <Badge variant="subtle" className="ml-2">
                                 {child.badge}
                               </Badge>
                             </div>
                           ) : (
                             <Link
-                              href={child.href}
+                              href={child.href || '#'}
                               className={`group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                                 child.current
-                                  ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                  ? 'bg-primary/10 text-primary'
+                                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                               }`}
                             >
                               <ChildIcon 
                                 className={`mr-3 flex-shrink-0 h-4 w-4 ${
-                                  child.current ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                                  child.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
                                 }`} 
                               />
                               {child.name}
@@ -183,29 +200,29 @@ export function Sidebar() {
           return (
             <div key={item.name} className="flex items-center">
               {item.badge ? (
-                <div className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 cursor-not-allowed w-full">
+                <div className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground/50 cursor-not-allowed w-full">
                   <Icon className="mr-3 flex-shrink-0 h-5 w-5" />
                   <span className="flex-1">{item.name}</span>
-                  <Badge variant="secondary" className="ml-2 text-xs">
+                  <Badge variant="subtle" className="ml-2">
                     {item.badge}
                   </Badge>
                 </div>
               ) : (
-            <Link
-              href={item.href}
+                <Link
+                  href={item.href || '#'}
                   className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer w-full ${
-                item.current
-                      ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border-r-2 border-yellow-700 dark:border-yellow-300'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-              }`}
-            >
-              <Icon 
-                className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                      item.current ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
-                }`} 
-              />
-              {item.name}
-            </Link>
+                    item.current
+                      ? 'bg-primary/10 text-primary border-r-2 border-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <Icon 
+                    className={`mr-3 flex-shrink-0 h-5 w-5 ${
+                      item.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                    }`} 
+                  />
+                  {item.name}
+                </Link>
               )}
             </div>
           );
@@ -213,27 +230,7 @@ export function Sidebar() {
       </nav>
 
       {/* Settings at bottom */}
-      {currentOrg.userRole === 'admin' && (
-                  <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
-          <Link
-            href={`/org/${currentOrg.id}/settings`}
-            className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-              pathname === `/org/${currentOrg.id}/settings`
-                ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Settings 
-              className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                pathname === `/org/${currentOrg.id}/settings` 
-                  ? 'text-yellow-700 dark:text-yellow-300' 
-                  : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
-              }`} 
-            />
-            Settings
-          </Link>
-        </div>
-      )}
+      {/* This is now moved into the main navigation */}
     </div>
   );
 } 

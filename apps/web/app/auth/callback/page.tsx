@@ -4,26 +4,19 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@lib/auth-client';
 import { useAppStore } from '@lib/stores/app-store';
-import { Organization } from 'better-auth/plugins';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const { setUser, setOrganizations, setCurrentOrg, setLoading } = useAppStore();
 
-  interface OrganizationWithMetadata extends Organization {
-    subscriptionPlan: string;
-    currency: string;
-    userRole: string;
-  }
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       setLoading(true);
-      
+
       try {
-        // Get session from better-auth
         const sessionResponse = await authClient.getSession();
-        
+
         if (!sessionResponse?.data?.user) {
           router.push('/auth/login');
           return;
@@ -31,30 +24,29 @@ export default function AuthCallbackPage() {
 
         const session = sessionResponse.data;
 
-        // Set user in store
         setUser({
           id: session.user.id,
           email: session.user.email,
           name: session.user.name,
         });
 
-        // Get user's organizations from better-auth
         const organizationsResponse = await authClient.organization.list();
-        const organizations = organizationsResponse?.data || [];
-        
+        const organizations = (organizationsResponse?.data || []).map((org: any) => ({
+          id: org.id,
+          name: org.name,
+          subscriptionPlan: org.metadata?.subscriptionPlan || 'free',
+          currency: org.metadata?.currency || 'USD',
+          userRole: org.userRole || 'viewer'
+        }));
         if (organizations && organizations.length > 0) {
           setOrganizations(organizations);
-          
-          // If user has only one org, auto-select it and redirect to dashboard
           if (organizations.length === 1) {
             setCurrentOrg(organizations[0]);
             router.push(`/org/${organizations[0].id}/dashboard`);
           } else {
-            // Multiple orgs - let user choose
             router.push('/org/select');
           }
         } else {
-          // No organizations - redirect to org creation
           router.push('/org/create');
         }
       } catch (error) {
@@ -76,4 +68,4 @@ export default function AuthCallbackPage() {
       </div>
     </div>
   );
-} 
+}

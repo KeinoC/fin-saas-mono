@@ -231,11 +231,11 @@ export function IntegrationConnector({ orgId }: { orgId: string }) {
       case 'connected':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'error':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle className="w-5 h-5 text-destructive" />;
       case 'available':
-        return <Settings className="w-5 h-5 text-blue-500" />;
+        return <Settings className="w-5 h-5 text-primary" />;
       case 'coming_soon':
-        return <Clock className="w-5 h-5 text-amber-500" />;
+        return <Clock className="w-5 h-5 text-muted-foreground" />;
       default:
         return null;
     }
@@ -244,27 +244,37 @@ export function IntegrationConnector({ orgId }: { orgId: string }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'connected':
-        return <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Connected</Badge>;
+        return <Badge variant="default" className="bg-green-600/10 text-green-500">Connected</Badge>;
       case 'error':
         return <Badge variant="destructive">Error</Badge>;
       case 'available':
         return <Badge variant="secondary">Available</Badge>;
       case 'coming_soon':
-        return <Badge variant="outline" className="border-amber-300 text-amber-700 dark:border-amber-600 dark:text-amber-400">Coming Soon</Badge>;
+        return <Badge variant="outline">Coming Soon</Badge>;
       default:
-        return <Badge variant="secondary">Disconnected</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
+  const integrationCategories = ['Productivity & Export', 'Financial & Accounting', 'Business Management'];
+  const groupedIntegrations = integrations.reduce((acc, integration) => {
+    const category = integration.category === 'productivity' ? 'Productivity & Export'
+                   : integration.category === 'financial' ? 'Financial & Accounting'
+                   : 'Business Management';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(integration);
+    return acc;
+  }, {} as Record<string, Integration[]>);
+
   return (
-    <div className="space-y-6">
-      {/* Category sections */}
       <div className="space-y-8">
-        {/* Productivity */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Productivity & Export</h3>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {integrations.filter(i => i.category === 'productivity').map((integration) => {
+      {integrationCategories.map(category => (
+        <div key={category}>
+          <h2 className="text-xl font-semibold text-foreground mb-4">{category}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(groupedIntegrations[category] || []).map(integration => {
               const Icon = integration.icon;
               const status = getIntegrationStatus(integration);
               const isConnecting = connecting === integration.id;
@@ -289,67 +299,7 @@ export function IntegrationConnector({ orgId }: { orgId: string }) {
             })}
           </div>
         </div>
-
-        {/* Financial */}
-      <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Financial & Accounting</h3>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {integrations.filter(i => i.category === 'financial').map((integration) => {
-              const Icon = integration.icon;
-              const status = getIntegrationStatus(integration);
-              const isConnecting = connecting === integration.id;
-
-              return (
-                <IntegrationCard
-                  key={integration.id}
-                  integration={integration}
-                  Icon={Icon}
-                  status={status}
-                  isConnecting={isConnecting}
-                  onConnect={handleConnect}
-                  getStatusIcon={getStatusIcon}
-                  getStatusBadge={getStatusBadge}
-                  googleIntegrations={googleIntegrations}
-                  setShowGoogleDetail={setShowGoogleDetail}
-                  handleDisconnect={handleDisconnect}
-                  acuityIntegration={acuityIntegration}
-                  setShowAcuityDetail={setShowAcuityDetail}
-                />
-              );
-            })}
-          </div>
-      </div>
-
-        {/* Business Operations */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Business Operations</h3>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {integrations.filter(i => i.category === 'business').map((integration) => {
-          const Icon = integration.icon;
-          const status = getIntegrationStatus(integration);
-          const isConnecting = connecting === integration.id;
-
-          return (
-                <IntegrationCard
-              key={integration.id}
-                  integration={integration}
-                  Icon={Icon}
-                  status={status}
-                  isConnecting={isConnecting}
-                  onConnect={handleConnect}
-                  getStatusIcon={getStatusIcon}
-                  getStatusBadge={getStatusBadge}
-                  googleIntegrations={googleIntegrations}
-                  setShowGoogleDetail={setShowGoogleDetail}
-                  handleDisconnect={handleDisconnect}
-                  acuityIntegration={acuityIntegration}
-                  setShowAcuityDetail={setShowAcuityDetail}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      ))}
 
       {/* Google Integration Detail Modal */}
       {showGoogleDetail && (
@@ -430,13 +380,13 @@ export function IntegrationConnector({ orgId }: { orgId: string }) {
       )}
 
       {(connectedIntegrations.length > 0 || googleIntegrations.length > 0 || acuityIntegration) && (
-        <Card className="bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+        <Card className="bg-green-500/10 border-green-500/20">
           <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="w-5 h-5 text-green-500" />
-              <h3 className="font-medium text-green-800 dark:text-green-200">Connected Integrations</h3>
+              <h3 className="font-medium text-green-400">Connected Integrations</h3>
           </div>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className="text-sm text-green-500/80">
             Your data will be automatically synced from connected services. 
             You can view and manage your financial data in the dashboard.
           </p>
@@ -476,107 +426,48 @@ function IntegrationCard({
   setShowAcuityDetail?: (show: boolean) => void;
 }) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Icon className="w-5 h-5 text-primary" />
+    <Card className="flex flex-col">
+      <CardHeader className="flex flex-row items-start space-x-4 pb-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+          <Icon className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
-              <CardTitle className="text-sm font-medium">{integration.name}</CardTitle>
-                    <div className="flex items-center gap-2 mt-1">
-                      {getStatusIcon(status)}
-                {getStatusBadge(status)}
-              {integration.id === 'google' && googleIntegrations.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                  ({googleIntegrations.length} integration{googleIntegrations.length !== 1 ? 's' : ''})
-                      </span>
-              )}
-                    </div>
-                  </div>
-                </div>
-                {status === 'connected' && (
-            <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                )}
+        <div className="flex-grow">
+          <CardTitle className="text-lg text-foreground">{integration.name}</CardTitle>
+          <CardDescription>{integration.description}</CardDescription>
               </div>
-        <CardDescription className="text-sm">{integration.description}</CardDescription>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className="flex-grow flex flex-col justify-between">
+        <div>
+          {getStatusBadge(status)}
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-border/60">
+          <div className="flex justify-between items-center">
               {status === 'connected' ? (
-                <div className="space-y-3">
-                  {integration.lastSync && (
-              <p className="text-xs text-muted-foreground">
-                      Last synced: {new Date(integration.lastSync).toLocaleDateString()}
-                    </p>
-                  )}
-          {integration.id === 'google' && googleIntegrations.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-              Last used: {new Date(Math.max(...googleIntegrations.map(g => new Date(g.lastUsedAt || g.createdAt).getTime()))).toLocaleDateString()}
-            </p>
-          )}
-                  <div className="flex gap-2">
-            {integration.id === 'google' ? (
                 <Button
-                onClick={() => setShowGoogleDetail(true)}
-                  className="w-full"
+                variant="outline"
                   size="sm"
+                onClick={() => {
+                  if (integration.id === 'google') setShowGoogleDetail(true);
+                  if (integration.id === 'acuity' && setShowAcuityDetail) setShowAcuityDetail(true);
+                }}
               >
-                Manage
+                Configure
                 </Button>
-            ) : integration.id === 'acuity' ? (
+            ) : status === 'available' ? (
                 <Button
-                onClick={() => setShowAcuityDetail?.(true)}
-                  className="w-full"
                   size="sm"
+                onClick={() => onConnect(integration.id)}
+                disabled={isConnecting}
               >
-                Manage
+                {isConnecting ? 'Connecting...' : 'Connect'}
                 </Button>
             ) : (
-              <>
-                  <Button
-                      onClick={() => handleDisconnect(integration.id)}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    >
-                      Disconnect
-                  </Button>
-                  <Button size="sm" className="flex-1">
-                      Sync Now
-                  </Button>
-              </>
+              <span className="text-sm text-muted-foreground">Unavailable</span>
             )}
-                  </div>
-                </div>
-      ) : status === 'available' ? (
-          <Button
-          onClick={() => onConnect(integration.id)}
-                  disabled={isConnecting}
-            className="w-full"
-            size="sm"
-                >
-          {isConnecting ? 'Connecting...' : integration.id === 'google' ? 'Configure' : 'Connect'}
-          </Button>
-      ) : status === 'coming_soon' ? (
-          <div className="w-full px-4 py-2 bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-400 rounded-lg text-center">
-          <div className="flex items-center justify-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm font-medium">Coming Soon</span>
           </div>
         </div>
-      ) : (
-          <Button
-          onClick={() => onConnect(integration.id)}
-          disabled={isConnecting || !integration.isAvailable}
-            variant="secondary"
-            className="w-full cursor-not-allowed"
-            size="sm"
-        >
-          Not Available
-          </Button>
-      )}
       </CardContent>
     </Card>
   );

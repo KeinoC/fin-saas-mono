@@ -206,9 +206,9 @@ export function DataImportsList({ orgId, refreshTrigger }: DataImportsListProps)
 
   if (loading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+      <div className="bg-card border border-border rounded-lg">
+        <div className="p-6 border-b border-border">
+          <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V7M4 7c0-2.21 1.79-4 4-4h8c2.21 0 4 1.79 4 4M4 7h16" />
             </svg>
@@ -217,7 +217,7 @@ export function DataImportsList({ orgId, refreshTrigger }: DataImportsListProps)
         </div>
         <div className="p-6">
           <div className="flex items-center justify-center py-8">
-            <div className="text-gray-500">Loading uploads...</div>
+            <div className="text-muted-foreground">Loading uploads...</div>
           </div>
         </div>
       </div>
@@ -225,19 +225,19 @@ export function DataImportsList({ orgId, refreshTrigger }: DataImportsListProps)
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg">
+    <div className="bg-card border border-border rounded-lg">
       {/* Toast Notification */}
       {downloadMessage && (
         <div className={`mx-4 mt-4 p-3 rounded-lg border transition-all duration-300 ${
           downloadMessage.includes('✅') 
-            ? 'bg-green-50 border-green-200 text-green-800' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-green-500/10 border-green-500/20 text-green-400' 
+            : 'bg-destructive/10 border-destructive/20 text-destructive'
         }`}>
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{downloadMessage}</span>
             <button
               onClick={() => setDownloadMessage(null)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground hover:text-foreground"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -247,151 +247,98 @@ export function DataImportsList({ orgId, refreshTrigger }: DataImportsListProps)
         </div>
       )}
       
-      <div className="p-6 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+      <div className="p-6 border-b border-border">
+        <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V7M4 7c0-2.21 1.79-4 4-4h8c2.21 0 4 1.79 4 4M4 7h16" />
           </svg>
           Data Imports
         </h3>
       </div>
-      <div className="p-6">
-        {imports.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No data imports yet</h3>
-            <p className="text-gray-500">Upload files or save data from integrations to get started.</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {imports.map((importItem) => (
-              <div key={importItem.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h4 className="font-medium text-gray-900">{importItem.filename}</h4>
-                        {(importItem as any).metadata?.source && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
-                            {(importItem as any).metadata.source}
-                          </span>
-                        )}
-                        {(importItem as any).metadata?.dataType && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                            {(importItem as any).metadata.dataType}
-                          </span>
-                        )}
-                        </div>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                        <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a4 4 0 118 0v4m-8 0V21h8a4 4 0 004-4V7M8 7H4" />
-                          </svg>
-                          {formatDate(importItem.createdAt)}
-                        </span>
-                        <span className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          {formatUserName(importItem.uploadedBy)}
-                        </span>
-                        <span>{formatFileSize(importItem.fileSize)}</span>
-                        {importItem.rowCount && (
-                          <span>{importItem.rowCount.toLocaleString()} rows</span>
-                        )}
-                      </div>
-                      {importItem.columns.length > 0 && (
-                        <div className="mt-2">
-                          <div className="text-sm text-gray-500 mb-1">Columns:</div>
-                          <div className="flex flex-wrap gap-1">
-                            {importItem.columns.slice(0, 5).map((column, index) => (
-                              <span key={index} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                                {column}
-                              </span>
-                            ))}
-                            {importItem.columns.length > 5 && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                                +{importItem.columns.length - 5} more
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+      
+      {imports.length === 0 ? (
+        <div className="p-6 text-center text-muted-foreground">
+          No data imports found.
+        </div>
+      ) : (
+        <div className="divide-y divide-border">
+          {imports.map(importItem => (
+            <div key={importItem.id} className="p-4 hover:bg-muted/50 transition-colors">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      importItem.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      importItem.status === 'failed' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {importItem.status}
-                    </span>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleDownload(importItem)}
-                        disabled={downloadStatus[importItem.id] === 'downloading'}
-                        className={`p-1 border border-gray-200 rounded hover:bg-gray-50 transition-colors ${
-                          downloadStatus[importItem.id] === 'downloading' 
-                            ? 'text-blue-500 cursor-not-allowed' 
-                            : downloadStatus[importItem.id] === 'success'
-                            ? 'text-green-600 hover:text-green-700'
-                            : downloadStatus[importItem.id] === 'error'
-                            ? 'text-red-600 hover:text-red-700'
-                            : 'text-gray-400 hover:text-blue-600'
-                        }`}
-                        title={
-                          downloadStatus[importItem.id] === 'downloading' 
-                            ? 'Downloading...' 
-                            : downloadStatus[importItem.id] === 'success'
-                            ? 'Downloaded successfully'
-                            : downloadStatus[importItem.id] === 'error'
-                            ? 'Download failed - click to retry'
-                            : 'Download original CSV'
-                        }
-                      >
-                        {downloadStatus[importItem.id] === 'downloading' ? (
-                          <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                        ) : downloadStatus[importItem.id] === 'success' ? (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : downloadStatus[importItem.id] === 'error' ? (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                          </svg>
-                        ) : (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M9 21h6a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(importItem.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:bg-gray-50"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                  <div className="flex-grow">
+                    {editingId === importItem.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && saveRename(importItem.id)}
+                          className="bg-input border border-border rounded px-2 py-1 text-sm text-foreground"
+                          autoFocus
+                        />
+                        <button onClick={() => saveRename(importItem.id)} className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90">Save</button>
+                        <button onClick={cancelEditing} className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded hover:bg-muted/80">Cancel</button>
+                      </div>
+                    ) : (
+                      <h4 className="font-semibold text-foreground">{importItem.filename}</h4>
+                    )}
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                      <span>{formatDate(importItem.createdAt)}</span>
+                      <span>{formatUserName(importItem.uploadedBy)}</span>
+                      <span>{formatFileSize(importItem.fileSize)}</span>
+                      {importItem.rowCount && <span>{importItem.rowCount} rows</span>}
                     </div>
+                    {importItem.columns?.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Columns:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {importItem.columns.slice(0, 5).map(col => (
+                            <span key={col} className="text-xs bg-muted px-2 py-0.5 rounded-full">{col}</span>
+                          ))}
+                          {importItem.columns.length > 5 && (
+                            <span className="text-xs bg-muted px-2 py-0.5 rounded-full">+{importItem.columns.length - 5} more</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    {importItem.status === 'completed' && (
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-green-500/10 text-green-400">completed</span>
+                    )}
+                    {importItem.status === 'pending' && (
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400">pending</span>
+                    )}
+                    {importItem.status === 'failed' && (
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-destructive/10 text-destructive">failed</span>
+                    )}
+                  </div>
+                  <button onClick={() => startEditing(importItem)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </button>
+                  <button onClick={() => handleDownload(importItem)} disabled={!!downloadStatus[importItem.id]} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-50">
+                    {downloadStatus[importItem.id] === 'downloading' 
+                      ? <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      : <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    }
+                  </button>
+                  <button onClick={() => handleDelete(importItem.id)} className="p-1.5 rounded-md hover:bg-destructive/20 text-muted-foreground hover:text-destructive">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 } 

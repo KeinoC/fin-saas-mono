@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import { TransformationService } from 'database/lib/transformation-service';
+import { SourceType } from 'config/types/data-transformation';
 
 // Extend global type for development persistence
 declare global {
@@ -294,6 +296,9 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Add transformed data to the response, and save it
+      const transformedData = await TransformationService.transform(parsedData, [], SourceType.CSV);
+
       // Try to save to database (if available)
       let dataImport: any = null;
       const DatabaseService = await getDatabaseService();
@@ -303,14 +308,14 @@ export async function POST(request: NextRequest) {
           dataImport = await DatabaseService.createDataImport({
             orgId,
             fileType,
-            data: parsedData,
+            data: transformedData as any,
             metadata: {
               originalFilename: file.name,
               fileSize: file.size,
               rowCount: parsedData.length,
               columns: Object.keys(parsedData[0] || {}),
               uploadedAt: new Date().toISOString(),
-            },
+            } as any,
             createdBy: userId,
           });
         } catch (dbError) {
@@ -326,7 +331,7 @@ export async function POST(request: NextRequest) {
             createdAt: new Date().toISOString(),
             uploadedBy: userId,
             columns: Object.keys(parsedData[0] || {}),
-            preview: parsedData.slice(0, 5),
+            preview: transformedData.slice(0, 10),
             fileUrl: null,
             metadata: {
               originalFilename: file.name,
@@ -354,7 +359,7 @@ export async function POST(request: NextRequest) {
           createdAt: new Date().toISOString(),
           uploadedBy: userId,
           columns: Object.keys(parsedData[0] || {}),
-          preview: parsedData.slice(0, 5),
+          preview: transformedData.slice(0, 10),
           fileUrl: null,
           metadata: {
             originalFilename: file.name,
@@ -370,10 +375,9 @@ export async function POST(request: NextRequest) {
         orgImports.push(dataImport);
         inMemoryImports.set(orgId, orgImports);
       }
-
-      // Store the original file in Supabase Storage (if available)
-      let storagePath = null;
-      let storageUrl = null;
+      
+      let storagePath: string | null = null;
+      let storageUrl: string | null = null;
       
       try {
         const supabase = await getSupabaseClient();
@@ -449,11 +453,13 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
+        message: 'File processed successfully',
         dataImport: {
           id: dataImport.id,
+          filename: file.name,
           rowCount: parsedData.length,
           columns: Object.keys(parsedData[0] || {}),
-          preview: parsedData.slice(0, 5), // First 5 rows for preview
+          preview: transformedData.slice(0, 10), // First 10 rows for preview
         },
       });
 

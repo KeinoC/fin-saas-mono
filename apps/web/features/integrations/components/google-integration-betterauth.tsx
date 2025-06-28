@@ -58,11 +58,11 @@ export function GoogleIntegrationBetterAuth({ orgId }: GoogleIntegrationProps) {
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center space-y-0 pb-4">
         <div className="flex items-center space-x-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
-            <Chrome className="h-6 w-6 text-blue-600" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <Chrome className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-lg">Google Integration</CardTitle>
+            <CardTitle className="text-lg text-foreground">Google Integration</CardTitle>
             <CardDescription>
               Connect your Google account to export data to Google Sheets
             </CardDescription>
@@ -70,7 +70,7 @@ export function GoogleIntegrationBetterAuth({ orgId }: GoogleIntegrationProps) {
         </div>
         <div className="ml-auto">
           {isConnected ? (
-            <Badge variant="default" className="bg-green-100 text-green-800">
+            <Badge variant="default" className="bg-green-600/10 text-green-500">
               <CheckCircle className="mr-1 h-3 w-3" />
               Connected
             </Badge>
@@ -84,17 +84,17 @@ export function GoogleIntegrationBetterAuth({ orgId }: GoogleIntegrationProps) {
 
       <CardContent className="space-y-4">
         {error && (
-          <div className="flex items-center space-x-2 rounded-md bg-red-50 p-3 text-red-800">
+          <div className="flex items-center space-x-2 rounded-md bg-destructive/10 p-3 text-destructive">
             <AlertCircle className="h-4 w-4" />
             <span className="text-sm">{error}</span>
           </div>
         )}
 
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Connecting your Google account will allow you to:
           </p>
-          <ul className="text-sm text-gray-600 space-y-1 ml-4">
+          <ul className="text-sm text-muted-foreground space-y-1 ml-4">
             <li>• Export financial data to Google Sheets</li>
             <li>• Create automated reports</li>
             <li>• Share data with team members</li>
@@ -138,7 +138,7 @@ export function GoogleIntegrationBetterAuth({ orgId }: GoogleIntegrationProps) {
         </div>
 
         {!session && (
-          <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
+          <p className="text-sm text-amber-500 bg-amber-500/10 p-2 rounded">
             Please sign in to connect your Google account.
           </p>
         )}

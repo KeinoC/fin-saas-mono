@@ -14,8 +14,8 @@ export function IntegrationsContent({ orgId }: IntegrationsContentProps) {
       <div className="bg-card shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Integrations</h1>
-            <p className="text-gray-600 mt-1">Connect your financial accounts and services</p>
+            <h1 className="text-2xl font-bold text-foreground">Integrations</h1>
+            <p className="text-muted-foreground mt-1">Connect your financial accounts and services</p>
           </div>
         </div>
       </div>
@@ -24,13 +24,13 @@ export function IntegrationsContent({ orgId }: IntegrationsContentProps) {
         <div className="space-y-8">
           {/* Better Auth Google Integration */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Google Services</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Google Services</h2>
             <GoogleIntegrationBetterAuth orgId={orgId} />
           </div>
           
           {/* Other Integrations */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Other Integrations</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Other Integrations</h2>
             <IntegrationConnector orgId={orgId} />
           </div>
         </div>

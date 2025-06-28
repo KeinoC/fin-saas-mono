@@ -48,4 +48,16 @@ export interface CreateAccountData {
   refreshToken?: string
   expiresAt?: Date
   lastSyncedAt?: Date
+}
+
+export interface CreateCategoryData {
+  orgId: string;
+  name: string;
+  parentId?: string;
+  businessType?: string;
+  isSystem?: boolean;
+  color?: string;
+  taxType?: string;
+  taxRate?: number;
+  createdBy?: string;
 } 

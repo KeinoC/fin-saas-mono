@@ -57,37 +57,37 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+      <DropdownMenuTrigger className="flex items-center space-x-2 p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer">
         <Avatar className="w-8 h-8">
           <AvatarImage src={user.image || undefined} alt={user.name || user.email || 'User'} />
-          <AvatarFallback className="bg-yellow-100 text-yellow-700 text-sm font-medium">
+          <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
             {userInitials}
           </AvatarFallback>
         </Avatar>
         <div className="hidden md:block text-left">
-          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+          <p className="text-sm font-medium text-foreground">
             {user.name || user.email?.split('@')[0]}
           </p>
-          <p className="text-xs text-gray-600 dark:text-gray-400">{user.email}</p>
+          <p className="text-xs text-muted-foreground">{user.email}</p>
         </div>
-        <ChevronDown className="w-4 h-4 text-gray-400 transition-transform" />
+        <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-80" align="end">
           {/* User Info Section */}
-        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-border">
             <div className="flex items-center space-x-3">
             <Avatar className="w-10 h-10">
               <AvatarImage src={user.image || undefined} alt={user.name || user.email || 'User'} />
-              <AvatarFallback className="bg-yellow-100 text-yellow-700 text-lg font-medium">
+              <AvatarFallback className="bg-primary/10 text-primary text-lg font-medium">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
               <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-foreground">
                   {user.name || user.email?.split('@')[0]}
                 </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">{user.email}</p>
+              <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@ export function UserDropdown() {
           {/* Organization Switching Section */}
           {organizations.length > 1 && (
           <>
-            <DropdownMenuLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <DropdownMenuLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Switch Organization
             </DropdownMenuLabel>
               <div className="max-h-32 overflow-y-auto">
@@ -106,11 +106,11 @@ export function UserDropdown() {
                   className="flex items-center justify-between cursor-pointer"
                   >
                     <div className="flex items-center space-x-2">
-                      <Building2 className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{org.name}</span>
+                      <Building2 className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">{org.name}</span>
                     </div>
                     {currentOrg?.id === org.id && (
-                      <Check className="w-4 h-4 text-yellow-600" />
+                      <Check className="w-4 h-4 text-primary" />
                     )}
                 </DropdownMenuItem>
                 ))}
@@ -125,7 +125,7 @@ export function UserDropdown() {
               href="/profile"
             className="flex items-center space-x-2 cursor-pointer"
             >
-              <User className="w-4 h-4 text-gray-400" />
+              <User className="w-4 h-4 text-muted-foreground" />
               <span>Profile</span>
             </Link>
         </DropdownMenuItem>
@@ -137,7 +137,7 @@ export function UserDropdown() {
                 href={`/org/${currentOrg.id}/settings`}
               className="flex items-center space-x-2 cursor-pointer"
               >
-                <Settings className="w-4 h-4 text-gray-400" />
+                <Settings className="w-4 h-4 text-muted-foreground" />
                 <span>Organization Settings</span>
               </Link>
           </DropdownMenuItem>
@@ -148,7 +148,7 @@ export function UserDropdown() {
             {/* Logout Option */}
         <DropdownMenuItem
               onClick={handleLogout}
-          className="flex items-center space-x-2 cursor-pointer text-red-600 dark:text-red-400"
+          className="flex items-center space-x-2 cursor-pointer text-destructive"
             >
           <LogOut className="w-4 h-4" />
               <span>Logout</span>
