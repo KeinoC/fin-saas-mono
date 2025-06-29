@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 export default function ProfilePage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const user = session?.user;
 
   useEffect(() => {
     if (!isPending && !session?.user) {
@@ -24,17 +25,18 @@ export default function ProfilePage() {
 
   if (isPending) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-700"></div>
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-yellow-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
-  if (!session?.user) {
-    return null;
+  if (!user) {
+    return null; // Will redirect in useEffect
   }
-
-  const user = session.user;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">

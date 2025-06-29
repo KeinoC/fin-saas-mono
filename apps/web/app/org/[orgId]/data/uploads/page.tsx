@@ -34,6 +34,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { PageLayout } from '@/components/layout/page-layout';
+import { useToast } from "@/components/ui/toast";
 
 interface DataSourcePageProps {
   params: Promise<{ orgId: string }>;
@@ -91,6 +92,7 @@ function DataSourceContent({ orgId }: { orgId: string }) {
   
   const { data: session, isPending } = useSession();
   const { currentOrg } = useAppStore();
+  const { toast } = useToast();
   
   // Get user information from session, with fallback
   const userId = session?.user?.id || 'anonymous';
@@ -307,7 +309,11 @@ function DataSourceContent({ orgId }: { orgId: string }) {
       });
     } catch (error) {
       console.error('Data retrieval error:', error);
-      alert(`Failed to retrieve data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to retrieve data',
+        variant: "destructive"
+      });
     } finally {
       setIsRetrieving(false);
     }

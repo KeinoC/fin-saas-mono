@@ -91,7 +91,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ 
+        error: 'Unauthorized', 
+        details: 'Please sign in to access this resource' 
+      }, { status: 401 });
     }
 
     const body = await request.json();
@@ -107,7 +110,10 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!orgId) {
-      return NextResponse.json({ error: 'Organization ID required' }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Missing required field', 
+        details: 'Organization ID is required for data retrieval' 
+      }, { status: 400 });
     }
 
     // Build retrieval options
@@ -157,7 +163,8 @@ export async function POST(request: NextRequest) {
     console.error('Data retrieval error:', error);
     return NextResponse.json({
       error: 'Failed to retrieve data',
-      details: error.message
+      details: error.message || 'An unexpected error occurred during data retrieval',
+      errorCode: error.code || 'UNKNOWN_ERROR'
     }, { status: 500 });
   }
 }

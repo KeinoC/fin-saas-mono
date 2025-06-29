@@ -28,7 +28,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, MoreHorizontal, Search, Circle, Loader2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, MoreHorizontal, Search, Circle, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -181,7 +181,22 @@ export default function CategoriesPage() {
     }
 
     if (pageState.status === 'error') {
-      return <div className="text-destructive">Error: {pageState.message}</div>;
+      return (
+        <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Categories</h3>
+            <p className="text-gray-600 mb-4">{pageState.message || 'An error occurred while loading categories. Please try again.'}</p>
+            <button
+              onClick={() => fetchCategories()}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-700 hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </button>
+          </div>
+        </div>
+      );
     }
 
     return (
