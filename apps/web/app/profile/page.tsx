@@ -10,6 +10,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function ProfilePage() {
   const { data: session, isPending } = useSession();
@@ -45,7 +46,7 @@ export default function ProfilePage() {
             className="inline-flex items-center text-yellow-700 hover:text-yellow-800 mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            Back to Overview
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
           <p className="mt-2 text-gray-600">Manage your account information</p>

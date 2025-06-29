@@ -111,22 +111,13 @@ const DropdownMenuItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     inset?: boolean
-    asChild?: boolean
   }
->(({ className, inset, asChild = false, children, ...props }, ref) => {
+>(({ className, inset, children, ...props }, ref) => {
   const baseClasses = cn(
     "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
     inset && "pl-8",
     className
   )
-
-  if (asChild) {
-    return React.cloneElement(children as React.ReactElement, {
-      className: cn(baseClasses, (children as React.ReactElement).props.className),
-      ref,
-      ...props
-    })
-  }
 
   return (
     <div

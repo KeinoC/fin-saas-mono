@@ -120,10 +120,10 @@ export function UserDropdown() {
           )}
 
           {/* Menu Options */}
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem>
             <Link
               href="/profile"
-            className="flex items-center space-x-2 cursor-pointer"
+            className="flex items-center space-x-2 cursor-pointer w-full"
             >
               <User className="w-4 h-4 text-muted-foreground" />
               <span>Profile</span>
@@ -132,10 +132,10 @@ export function UserDropdown() {
 
             {/* Settings Option (only for admins) */}
             {currentOrg && currentOrg.userRole === 'admin' && (
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem>
               <Link
                 href={`/org/${currentOrg.id}/settings`}
-              className="flex items-center space-x-2 cursor-pointer"
+              className="flex items-center space-x-2 cursor-pointer w-full"
               >
                 <Settings className="w-4 h-4 text-muted-foreground" />
                 <span>Organization Settings</span>

@@ -2,6 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface FileUploaderProps {
   orgId: string;
@@ -29,6 +32,7 @@ interface FileUpload {
 
 export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: FileUploaderProps) {
   const [uploads, setUploads] = useState<FileUpload[]>([]);
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const uploadFile = async (fileUpload: FileUpload) => {
     setUploads(prev => 
@@ -124,6 +128,37 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
           : upload
       )
     );
+  };
+
+  const processFile = async (upload: FileUpload) => {
+    if (!upload.result) return;
+    setIsProcessing(upload.id);
+
+    try {
+      const response = await fetch('/api/data/transform', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dataImportId: upload.result.id,
+          // In the future, we'll pass transformation rules here
+          transformationRules: [], 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Processing failed');
+      }
+
+      // You can update the UI to show that processing is complete
+      console.log('Processing successful:', data);
+
+    } catch (err) {
+      console.error('Processing error:', err);
+    } finally {
+      setIsProcessing(null);
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -250,15 +285,25 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
                         Detected {upload.result.columns.length} columns
                       </p>
                     </div>
-                    <button
+                    <Button
+                      size="sm"
                       onClick={() => closePreview(upload.id)}
-                      className="text-sm text-muted-foreground hover:text-foreground"
                     >
-                      Hide preview
-                    </button>
+                      Close
+                    </Button>
+                  </div>
+                  
+                  {/* Transformation Trigger */}
+                  <div className="mt-4 border-t border-border pt-4">
+                    <Button
+                      onClick={() => processFile(upload)}
+                      disabled={isProcessing === upload.id}
+                    >
+                      {isProcessing === upload.id ? 'Processing...' : 'Process Data'}
+                    </Button>
                   </div>
 
-                  {upload.result.preview && upload.result.preview.length > 0 && (
+                  {upload.result?.preview && upload.result.preview.length > 0 && upload.result.columns && (
                     <div>
                       <p className="text-sm font-medium text-foreground mb-2">Data Preview:</p>
                       <div className="bg-card rounded border border-border shadow-sm">
@@ -279,7 +324,7 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
                             <tbody className="divide-y divide-border">
                               {upload.result.preview.map((row, rowIndex) => (
                                 <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-background' : 'bg-muted/30'}>
-                                  {upload.result.columns.map((column, colIndex) => (
+                                  {upload.result!.columns.map((column, colIndex) => (
                                     <td 
                                       key={`${rowIndex}-${colIndex}`}
                                       className="px-3 py-2 text-xs text-foreground whitespace-nowrap overflow-hidden text-ellipsis"

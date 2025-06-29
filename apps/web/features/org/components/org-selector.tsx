@@ -18,36 +18,40 @@ export function OrgSelector() {
   const { currentOrg, organizations, switchOrganization } = useAppStore();
   const router = useRouter();
 
-  const handleSelectOrg = (orgId: string) => {
+  const handleOrgChange = (orgId: string) => {
     switchOrganization(orgId);
-    router.push(`/org/${orgId}/dashboard`);
+    router.push(`/org/${orgId}/overview`);
+  };
+
+  const handleCreateNew = () => {
+    // ... existing code ...
   };
 
   if (!currentOrg && organizations.length === 0) {
     return (
-      <Button asChild className="w-full">
-        <Link href="/org/create" className="flex items-center gap-2">
+      <Link href="/org/create" className="w-full">
+        <Button className="w-full flex items-center gap-2">
         <Plus className="w-4 h-4" />
         Create Organization
-      </Link>
       </Button>
+      </Link>
     );
   }
 
   if (!currentOrg && organizations.length > 0) {
     return (
-      <Button asChild variant="outline" className="w-full">
-        <Link href="/org/select" className="flex items-center gap-2">
+      <Link href="/org/select" className="w-full">
+        <Button variant="outline" className="w-full flex items-center gap-2">
         <Building2 className="w-4 h-4" />
         Select Organization
-      </Link>
       </Button>
+      </Link>
     );
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger>
         <Button
           variant="outline"
           className="flex items-center gap-2 w-full justify-between min-w-[180px]"
@@ -76,7 +80,7 @@ export function OrgSelector() {
               {organizations.map((org) => (
             <DropdownMenuItem
                   key={org.id}
-                  onClick={() => handleSelectOrg(org.id)}
+                  onClick={() => handleOrgChange(org.id)}
               className="flex items-center justify-between p-3 cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
@@ -119,10 +123,10 @@ export function OrgSelector() {
             
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem>
               <Link
                 href="/org/create"
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer w-full"
               >
                 <Plus className="w-4 h-4" />
                 Create New Organization

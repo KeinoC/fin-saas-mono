@@ -3,6 +3,7 @@
 import { ArrowLeft, Building2, Users, FileText, BarChart, CreditCard, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface ComingSoonProps {
   title: string;
@@ -21,6 +22,7 @@ export function ComingSoon({ title, description, orgId, icon = 'settings' }: Com
   };
 
   const IconComponent = iconMap[icon];
+  const router = useRouter();
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center px-4">
@@ -42,15 +44,12 @@ export function ComingSoon({ title, description, orgId, icon = 'settings' }: Com
         </div>
 
         <div className="space-y-4">
-          <Button asChild>
-            <Link
-              href={`/org/${orgId}/dashboard`}
-              className="inline-flex items-center"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Link>
-          </Button>
+          <Link
+            href={`/org/${orgId}/overview`}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors"
+          >
+            Back to Overview
+          </Link>
           
           <div className="text-center">
             <Link

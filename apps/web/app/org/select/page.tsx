@@ -43,7 +43,7 @@ export default function OrgSelectPage() {
 
         if (result.data && result.data.length > 0) {
           const formattedOrgs = result.data.map((org: any) => {
-            let metadata = {};
+            let metadata: any = {};
             try {
               metadata = org.metadata ? JSON.parse(org.metadata) : {};
             } catch (e) {
@@ -53,7 +53,7 @@ export default function OrgSelectPage() {
             return {
               id: org.id,
               name: org.name,
-              subscriptionPlan: metadata.subscriptionPlan || 'free',
+              subscriptionPlan: (metadata.subscriptionPlan || 'free') as 'free' | 'pro' | 'enterprise',
               currency: metadata.currency || 'USD',
               userRole: 'admin' as const, // For now, assume admin since user created the org
             };
@@ -64,7 +64,7 @@ export default function OrgSelectPage() {
           // If user has only one org and no current org selected, auto-select it
           if (formattedOrgs.length === 1 && !currentOrg) {
             switchOrganization(formattedOrgs[0].id);
-            router.push(`/org/${formattedOrgs[0].id}/dashboard`);
+            router.push(`/org/${formattedOrgs[0].id}/overview`);
             return;
           }
         }
@@ -81,13 +81,13 @@ export default function OrgSelectPage() {
   // If current org is already selected, redirect to dashboard
   useEffect(() => {
     if (currentOrg && !isLoadingOrgs) {
-      router.push(`/org/${currentOrg.id}/dashboard`);
+      router.push(`/org/${currentOrg.id}/overview`);
     }
   }, [currentOrg, router, isLoadingOrgs]);
 
   const handleSelectOrg = (orgId: string) => {
     switchOrganization(orgId);
-    router.push(`/org/${orgId}/dashboard`);
+    router.push(`/org/${orgId}/overview`);
   };
 
   const handleJoinByCode = async () => {
@@ -103,7 +103,7 @@ export default function OrgSelectPage() {
         const newOrg = {
           id: crypto.randomUUID(),
           name: 'Demo Organization',
-          subscriptionPlan: 'pro',
+          subscriptionPlan: 'pro' as 'free' | 'pro' | 'enterprise',
           currency: 'USD',
           userRole: 'editor' as const,
         };
@@ -115,7 +115,7 @@ export default function OrgSelectPage() {
         
         // Auto-select the new organization
         switchOrganization(newOrg.id);
-        router.push(`/org/${newOrg.id}/dashboard`);
+        router.push(`/org/${newOrg.id}/overview`);
       } else {
         setJoinError('Invalid invite code. Please check and try again.');
       }
@@ -125,8 +125,6 @@ export default function OrgSelectPage() {
       setIsJoining(false);
     }
   };
-
-
 
   if (isPending || isLoadingOrgs) {
     return (

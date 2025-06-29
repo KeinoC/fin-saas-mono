@@ -16,7 +16,7 @@ interface CreateOrgForm {
 
 export default function CreateOrgPage() {
   const { data: session } = useSession();
-  const { setCurrentOrg, setOrganizations, organizations } = useAppStore();
+  const { setCurrentOrg, setOrganizations, organizations, switchOrganization } = useAppStore();
   const router = useRouter();
   
   const [formData, setFormData] = useState<CreateOrgForm>({
@@ -51,8 +51,8 @@ export default function CreateOrgPage() {
       }
 
       // Transform the better-auth organization to our app format
-      // The structure might be result.data.organization or just result.data
-      const organization = result.data?.organization || result.data;
+      // The structure is result.data
+      const organization = result.data;
       if (!organization || !organization.id) {
         throw new Error('Invalid organization data returned from server');
       }
@@ -60,7 +60,7 @@ export default function CreateOrgPage() {
       const newOrg = {
         id: organization.id,
         name: organization.name,
-        subscriptionPlan: formData.plan,
+        subscriptionPlan: formData.plan as 'free' | 'pro' | 'enterprise',
         currency: formData.currency,
         userRole: 'admin' as const, // Match the creatorRole we set in auth config
       };
@@ -70,8 +70,10 @@ export default function CreateOrgPage() {
       setOrganizations(updatedOrgs);
       setCurrentOrg(newOrg);
 
+      switchOrganization(newOrg.id);
+
       // Navigate to dashboard
-      router.push(`/org/${newOrg.id}/dashboard`);
+      router.push(`/org/${newOrg.id}/overview`);
     } catch (error: any) {
       console.error('Organization creation error:', error);
       setError(error.message || 'Failed to create organization. Please try again.');

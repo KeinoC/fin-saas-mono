@@ -16,7 +16,8 @@ import {
   Home,
   CreditCard,
   FileBarChart,
-  Users
+  Users,
+  Globe
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -70,10 +71,10 @@ export function Navbar() {
   // Mobile navigation for current org
   const mobileNavigation = currentOrg ? [
     {
-      name: 'Dashboard',
-      href: `/org/${currentOrg.id}/dashboard`,
+      name: 'Overview',
+      href: `/org/${currentOrg.id}/overview`,
       icon: Home,
-      current: pathname === `/org/${currentOrg.id}/dashboard`,
+      current: pathname === `/org/${currentOrg.id}/overview` || pathname === `/org/${currentOrg.id}/dashboard`,
     },
     {
       name: 'Integrations',
@@ -114,10 +115,10 @@ export function Navbar() {
           {/* Left side */}
           <div className="flex items-center">
             {/* Logo */}
-            <Link href={currentOrg ? `/org/${currentOrg.id}/dashboard` : '/org/select'} className="flex items-center cursor-pointer">
-              <div className="flex-shrink-0 flex items-center">
-                <BarChart3 className="h-8 w-8 text-primary" />
-                <span className="ml-2 text-xl font-bold text-foreground">K-Fin</span>
+            <Link href={currentOrg ? `/org/${currentOrg.id}/overview` : '/org/select'} className="flex items-center cursor-pointer">
+              <div className="flex-shrink-0">
+                <Globe className="w-8 h-8 text-primary" />
+                <span className="ml-2 text-xl font-bold text-foreground">k-fin</span>
               </div>
             </Link>
           </div>

@@ -20,7 +20,11 @@ import {
   Info
 } from 'lucide-react';
 import { useAppStore } from '@lib/stores/app-store';
-import { GoogleAuthMethod, GoogleServiceAccountCredentials } from '@lib/services/google-api';
+// import { GoogleAuthMethod, GoogleServiceAccountCredentials } from '@lib/services/google-api';
+
+// Temporary stub types for build
+type GoogleAuthMethod = 'oauth' | 'service_account';
+type GoogleServiceAccountCredentials = any;
 
 interface GoogleIntegration {
   id: string;

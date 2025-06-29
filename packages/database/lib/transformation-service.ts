@@ -1,4 +1,7 @@
 import { TransformedDataRow, TransformationRule, SourceType, DataType } from 'config/types/data-transformation';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export class TransformationService {
   /**
@@ -125,5 +128,24 @@ export class TransformationService {
       { id: 'software', name: 'Software' },
       { id: 'uncategorized', name: 'Uncategorized' },
     ];
+  }
+
+  /**
+   * Transforms raw data from an import and saves it to the TransformedData table.
+   * @param dataImportId - The ID of the data import to process.
+   * @param transformationRules - The rules to apply to the data.
+   */
+  static async transformAndSaveData(dataImportId: string, transformationRules: any[]) {
+    // 1. Fetch the raw data from the DataImport table.
+    // 2. Apply the transformation rules to each row.
+    // 3. Save the transformed data to the TransformedData table.
+    
+    console.log(`Transforming data for import ${dataImportId} with rules:`, transformationRules);
+    
+    // Placeholder for transformation logic
+    return {
+      success: true,
+      message: 'Data transformation is not yet implemented.',
+    };
   }
 } 

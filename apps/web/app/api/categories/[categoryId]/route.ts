@@ -3,11 +3,11 @@ import { DatabaseService } from 'database';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
     // Temporarily skip auth check for development
-    const categoryId = params.categoryId;
+    const { categoryId } = await params;
     const body = await request.json();
     const { name, parentId, businessType, color, taxType, taxRate } = body;
 
@@ -26,24 +26,26 @@ export async function PUT(
 
     return NextResponse.json(updatedCategory);
   } catch (error) {
-    console.error(`Error updating category ${params.categoryId}:`, error);
+    const { categoryId } = await params;
+    console.error(`Error updating category ${categoryId}:`, error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
     // Temporarily skip auth check for development
-    const categoryId = params.categoryId;
+    const { categoryId } = await params;
 
     await DatabaseService.deleteCategory(categoryId);
 
     return NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 });
   } catch (error) {
-    console.error(`Error deleting category ${params.categoryId}:`, error);
+    const { categoryId } = await params;
+    console.error(`Error deleting category ${categoryId}:`, error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 } 

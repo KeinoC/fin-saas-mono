@@ -13,11 +13,12 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isPending && session?.user) {
-      // Redirect authenticated users
+    if (session?.user) {
+      // If user is logged in and has an org, redirect to that org's dashboard
       if (currentOrg) {
-        router.push(`/org/${currentOrg.id}/dashboard`);
+        router.push(`/org/${currentOrg.id}/overview`);
       } else {
+        // If user has no current org selected, go to org selection
         router.push('/org/select');
       }
     }

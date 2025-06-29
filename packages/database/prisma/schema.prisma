@@ -28,7 +28,7 @@ model Organization {
   auditLogs        AuditLog[]
   invitations      Invitation[]
   googleIntegrations GoogleIntegration[]
-  categories       Category[]
+  transformedData  TransformedData[]
 
   @@map("orgs")
 }
@@ -247,39 +247,33 @@ model GoogleIntegration {
   // Common fields
   scopes       String[] // Array of scopes/permissions
   isActive     Boolean  @default(true)
+  acuityIntegrationId String?
   lastUsedAt   DateTime?
+  
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
+
   // Relations
+  integration  Account? @relation(fields: [acuityIntegrationId], references: [id], onDelete: SetNull)
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  
-  @@unique([orgId, email, authMethod])
+
   @@map("google_integrations")
 }
 
-model Category {
-  id            String  @id @default(uuid())
-  orgId         String
-  name          String
-  parentId      String? @map("parent_id")
-  businessType  String? @map("business_type")
-  isSystem      Boolean @default(false) @map("is_system")
-  color         String?
-  taxType       String? @map("tax_type")
-  taxRate       Decimal? @db.Decimal(5, 4) @map("tax_rate")
-  createdBy     String? @map("created_by") // "system" or user ID
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+model TransformedData {
+  id          String    @id @default(uuid())
+  orgId       String    @map("org_id")
+  name        String
+  date        DateTime
+  amount      Decimal   @db.Decimal(19, 4)
+  source      SourceType
+  dataType    DataType  @map("data_type")
+  data        Json      @default("{}") // Stores categoryLevel1, categoryLevel2, etc.
+  createdAt   DateTime  @default(now()) @map("created_at")
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
-  // Relations
-  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  parent        Category?    @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete:NoAction, onUpdate: NoAction)
-  children      Category[]   @relation("CategoryHierarchy")
-
-  @@index([orgId])
-  @@index([name])
-  @@map("categories")
+  @@map("transformed_data")
+  @@index([orgId, date])
 }
 
 // Enums
@@ -314,4 +308,17 @@ enum Frequency {
   daily
   weekly
   monthly
+}
+
+enum DataType {
+  ACTUAL
+  BUDGET
+  FORECAST
+}
+
+enum SourceType {
+  PLAID
+  GOOGLE_SHEETS
+  ACUITY
+  CSV
 } 

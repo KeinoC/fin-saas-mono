@@ -7,7 +7,7 @@ import { useAppStore } from '@lib/stores/app-store';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const { setUser, setOrganizations, setCurrentOrg, setLoading } = useAppStore();
+  const { setUser, setOrganizations, setCurrentOrg, setLoading, switchOrganization } = useAppStore();
 
 
   useEffect(() => {
@@ -42,7 +42,8 @@ export default function AuthCallbackPage() {
           setOrganizations(organizations);
           if (organizations.length === 1) {
             setCurrentOrg(organizations[0]);
-            router.push(`/org/${organizations[0].id}/dashboard`);
+            switchOrganization(organizations[0].id);
+            router.push(`/org/${organizations[0].id}/overview`);
           } else {
             router.push('/org/select');
           }
@@ -58,7 +59,7 @@ export default function AuthCallbackPage() {
     };
 
     handleAuthCallback();
-  }, [router, setUser, setOrganizations, setCurrentOrg, setLoading]);
+  }, [router, setUser, setOrganizations, setCurrentOrg, setLoading, switchOrganization]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

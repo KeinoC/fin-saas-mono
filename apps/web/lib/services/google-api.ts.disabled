@@ -50,13 +50,13 @@ export class GoogleAPIService {
         'dummy-client-id',
         'dummy-client-secret',
         this.getRedirectUri()
-      );
+      ) as any;
     } else {
     this.oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       this.getRedirectUri()
-    );
+    ) as any;
     }
   }
 
@@ -92,14 +92,15 @@ export class GoogleAPIService {
   }
 
   async getTokensFromCode(code: string): Promise<GoogleOAuthCredentials> {
-    const { tokens } = await this.oauth2Client.getAccessToken(code);
+    const response = await this.oauth2Client.getToken(code);
+    const tokens = response.tokens;
     
     return {
       access_token: tokens.access_token!,
       refresh_token: tokens.refresh_token!,
       scope: tokens.scope!,
       token_type: tokens.token_type!,
-      expiry_date: tokens.expiry_date,
+      expiry_date: tokens.expiry_date || undefined,
     };
   }
 
@@ -109,7 +110,7 @@ export class GoogleAPIService {
       email: credentials.client_email,
       key: credentials.private_key,
       scopes,
-    });
+    }) as any;
   }
 
   validateServiceAccountCredentials(credentials: GoogleServiceAccountCredentials): boolean {
@@ -131,7 +132,7 @@ export class GoogleAPIService {
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
         this.getRedirectUri()
-      );
+      ) as any;
 
       client.setCredentials({
         access_token: credentials.access_token,
@@ -235,7 +236,7 @@ export class GoogleAPIService {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       this.getRedirectUri()
-    );
+    ) as any;
     
     client.setCredentials({
       access_token: credentials.access_token,
@@ -261,7 +262,7 @@ export class GoogleAPIService {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       this.getRedirectUri()
-    );
+    ) as any;
     
     client.setCredentials({
       access_token: credentials.access_token,

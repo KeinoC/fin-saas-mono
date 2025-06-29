@@ -459,7 +459,7 @@ export class DataRetrievalService {
     await prisma.dataImport.create({
       data: {
         orgId,
-        fileType: 'json',
+        fileType: 'csv',
         data: retrievedData.records,
         metadata: {
           source: retrievedData.source,

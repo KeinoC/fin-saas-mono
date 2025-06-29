@@ -17,7 +17,9 @@ import {
   Database,
   GitBranch,
   Clock,
-  TrendingUp
+  TrendingUp,
+  FileText,
+  Warehouse
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
@@ -53,10 +55,25 @@ export function Sidebar() {
 
   const navigation: NavItem[] = [
     {
-      name: 'Dashboard',
-      href: `/org/${currentOrg.id}/dashboard`,
+      name: 'Overview',
+      href: `/org/${currentOrg.id}/overview`,
       icon: Home,
-      current: pathname === `/org/${currentOrg.id}/dashboard`,
+      current: pathname === `/org/${currentOrg.id}/dashboard` || pathname === `/org/${currentOrg.id}/overview`,
+    },
+    {
+      name: 'Reports',
+      icon: TrendingUp,
+      current: pathname.startsWith(`/org/${currentOrg.id}/reports`),
+      expandable: true,
+      expanded: expandedItems.includes('reports'),
+      children: [
+        {
+          name: 'P&L',
+          href: `/org/${currentOrg.id}/pnl`,
+          icon: FileText,
+          current: pathname.startsWith(`/org/${currentOrg.id}/pnl`),
+        },
+      ],
     },
     {
       name: 'Integrations',
@@ -78,10 +95,22 @@ export function Sidebar() {
           current: pathname.startsWith(`/org/${currentOrg.id}/data/uploads`),
         },
         {
+          name: 'Raw Data Mapping',
+          href: `/org/${currentOrg.id}/data/raw-data-mapping`,
+          icon: FileText,
+          current: pathname.startsWith(`/org/${currentOrg.id}/data/raw-data-mapping`),
+        },
+        {
           name: 'Categories',
           href: `/org/${currentOrg.id}/data/categories`,
           icon: GitBranch,
           current: pathname.startsWith(`/org/${currentOrg.id}/data/categories`),
+        },
+        {
+          name: 'Data Warehouse',
+          href: `/org/${currentOrg.id}/data/warehouse`,
+          icon: Warehouse,
+          current: pathname.startsWith(`/org/${currentOrg.id}/data/warehouse`),
         },
       ],
     },
@@ -97,13 +126,6 @@ export function Sidebar() {
       href: `/org/${currentOrg.id}/scenarios`,
       icon: FileBarChart,
       current: pathname === `/org/${currentOrg.id}/scenarios`,
-      badge: 'Coming Soon',
-    },
-    {
-      name: 'Reports',
-      href: `/org/${currentOrg.id}/reports`,
-      icon: TrendingUp,
-      current: pathname === `/org/${currentOrg.id}/reports`,
       badge: 'Coming Soon',
     },
     {
@@ -163,31 +185,26 @@ export function Sidebar() {
                       const ChildIcon = child.icon;
                       return (
                         <div key={child.name} className="flex items-center">
-                          {child.badge ? (
-                            <div className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground/50 cursor-not-allowed">
-                              <ChildIcon className="mr-3 flex-shrink-0 h-4 w-4" />
-                              <span className="flex-1">{child.name}</span>
+                          <Link
+                            href={child.href || '#'}
+                            className={`group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
+                              child.current
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            }`}
+                          >
+                            <ChildIcon 
+                              className={`mr-3 flex-shrink-0 h-4 w-4 ${
+                                child.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                              }`} 
+                            />
+                            <span className="flex-1">{child.name}</span>
+                            {child.badge && (
                               <Badge variant="subtle" className="ml-2">
                                 {child.badge}
                               </Badge>
-                            </div>
-                          ) : (
-                            <Link
-                              href={child.href || '#'}
-                              className={`group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
-                                child.current
-                                  ? 'bg-primary/10 text-primary'
-                                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                              }`}
-                            >
-                              <ChildIcon 
-                                className={`mr-3 flex-shrink-0 h-4 w-4 ${
-                                  child.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                                }`} 
-                              />
-                              {child.name}
-                            </Link>
-                          )}
+                            )}
+                          </Link>
                         </div>
                       );
                     })}
@@ -199,31 +216,26 @@ export function Sidebar() {
           
           return (
             <div key={item.name} className="flex items-center">
-              {item.badge ? (
-                <div className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground/50 cursor-not-allowed w-full">
-                  <Icon className="mr-3 flex-shrink-0 h-5 w-5" />
-                  <span className="flex-1">{item.name}</span>
+              <Link
+                href={item.href || '#'}
+                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer w-full ${
+                  item.current
+                    ? 'bg-primary/10 text-primary border-r-2 border-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <Icon 
+                  className={`mr-3 flex-shrink-0 h-5 w-5 ${
+                    item.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                  }`} 
+                />
+                <span className="flex-1">{item.name}</span>
+                {item.badge && (
                   <Badge variant="subtle" className="ml-2">
                     {item.badge}
                   </Badge>
-                </div>
-              ) : (
-                <Link
-                  href={item.href || '#'}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer w-full ${
-                    item.current
-                      ? 'bg-primary/10 text-primary border-r-2 border-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <Icon 
-                    className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                      item.current ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
-                    }`} 
-                  />
-                  {item.name}
-                </Link>
-              )}
+                )}
+              </Link>
             </div>
           );
         })}

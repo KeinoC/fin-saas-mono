@@ -22,6 +22,14 @@ export interface TransformedDataRow {
   [key: string]: any;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  parent_id?: string;
+  business_type?: string;
+  created_by?: string;
+}
+
 export interface TransformationRule {
   field: string;
   operation: 'normalize' | 'categorize' | 'calculate' | 'format';

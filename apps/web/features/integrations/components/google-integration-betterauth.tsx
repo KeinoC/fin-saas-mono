@@ -29,8 +29,8 @@ export function GoogleIntegrationBetterAuth({ orgId }: GoogleIntegrationProps) {
       });
       
       // Better Auth returns a redirect URL, so we need to redirect manually
-      if (response?.url) {
-        window.location.href = response.url;
+      if (response && 'url' in response && response.url) {
+        window.location.href = response.url as string;
       }
     } catch (err) {
       console.error('Google connection error:', err);
