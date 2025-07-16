@@ -92,7 +92,7 @@ function DataSourceContent({ orgId }: { orgId: string }) {
   
   const { data: session, isPending } = useSession();
   const { currentOrg } = useAppStore();
-  const { toast } = useToast();
+  const { addToast } = useToast();
   
   // Get user information from session, with fallback
   const userId = session?.user?.id || 'anonymous';
@@ -309,10 +309,10 @@ function DataSourceContent({ orgId }: { orgId: string }) {
       });
     } catch (error) {
       console.error('Data retrieval error:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to retrieve data',
-        variant: "destructive"
+      addToast({
+        type: "error",
+        title: "Error", 
+        description: error instanceof Error ? error.message : 'Failed to retrieve data'
       });
     } finally {
       setIsRetrieving(false);

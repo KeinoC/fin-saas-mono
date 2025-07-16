@@ -1,24 +1,14 @@
 import type { Prisma } from '@prisma/client'
 
-export type OrganizationWithUsers = Prisma.OrganizationGetPayload<{
-  include: { orgUsers: true }
-}>
+export type OrganizationWithUsers = any
 
-export type ScenarioWithVersions = Prisma.ScenarioGetPayload<{
-  include: { scenarioVersions: true }
-}>
+export type ScenarioWithVersions = any
 
-export type DataImportWithOrg = Prisma.DataImportGetPayload<{
-  include: { organization: true }
-}>
+export type DataImportWithOrg = any
 
-export type NotificationWithOrg = Prisma.NotificationGetPayload<{
-  include: { organization: true }
-}>
+export type NotificationWithOrg = any
 
-export type AccountWithOrg = Prisma.AccountGetPayload<{
-  include: { organization: true }
-}>
+export type AccountWithOrg = any
 
 export interface CreateOrganizationData {
   name: string

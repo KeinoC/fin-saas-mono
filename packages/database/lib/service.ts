@@ -1,4 +1,4 @@
-import { IntegrationSource } from '@prisma/client'
+// import { string } from '@prisma/client'
 import { prisma } from './client'
 import type {
   CreateOrganizationData,
@@ -39,35 +39,35 @@ export class DatabaseService {
   }
 
   // Category methods
-  static async createCategory(data: CreateCategoryData) {
-    return await prisma.category.create({
-      data,
-    });
-  }
+  // static async createCategory(data: CreateCategoryData) {
+  //   return await prisma.category.create({
+  //     data,
+  //   });
+  // }
 
-  static async getCategoriesByOrgId(orgId: string) {
-    return await prisma.category.findMany({
-      where: { orgId },
-      orderBy: { name: 'asc' },
-    });
-  }
+  // static async getCategoriesByOrgId(orgId: string) {
+  //   return await prisma.category.findMany({
+  //     where: { orgId },
+  //     orderBy: { name: 'asc' },
+  //   });
+  // }
 
-  static async updateCategory(id: string, data: Partial<CreateCategoryData>) {
-    return await prisma.category.update({
-      where: { id },
-      data,
-    });
-  }
+  // static async updateCategory(id: string, data: Partial<CreateCategoryData>) {
+  //   return await prisma.category.update({
+  //     where: { id },
+  //     data,
+  //   });
+  // }
 
-  static async deleteCategory(id: string) {
-    // Note: This is a simple delete. In a real-world scenario, you might need to handle
-    // what happens to items associated with this category.
-    // Also, deleting a category with children might fail if there's a foreign key constraint.
-    // You might need to handle children reassignment or deletion in a transaction.
-    return await prisma.category.delete({
-      where: { id },
-    });
-  }
+  // static async deleteCategory(id: string) {
+  //   // Note: This is a simple delete. In a real-world scenario, you might need to handle
+  //   // what happens to items associated with this category.
+  //   // Also, deleting a category with children might fail if there's a foreign key constraint.
+  //   // You might need to handle children reassignment or deletion in a transaction.
+  //   return await prisma.category.delete({
+  //     where: { id },
+  //   });
+  // }
 
   // Data Import methods
   static async createDataImport(data: CreateDataImportData) {
@@ -150,7 +150,7 @@ export class DatabaseService {
     return await prisma.account.create({
       data: {
         ...data,
-        source: data.source as IntegrationSource
+        source: data.source as any
       },
       include: { organization: true }
     })
@@ -166,7 +166,7 @@ export class DatabaseService {
   static async getAccount(orgId: string, source: string) {
     return await prisma.account.findUnique({
       where: { 
-        orgId_source: { orgId, source: source as IntegrationSource }
+        orgId_source: { orgId, source: source as string }
       },
       include: { organization: true }
     })
@@ -177,7 +177,7 @@ export class DatabaseService {
       where: { id },
       data: {
         ...data,
-        source: data.source as IntegrationSource
+        source: data.source as any
       },
       include: { organization: true }
     })

@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Format the response to extract category data from JSON
-    const formattedItems = items.map(item => {
+    const formattedItems = items.map((item: any) => {
       const data = item.data as any || {};
       return {
         id: item.id,

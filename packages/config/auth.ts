@@ -1,26 +1,15 @@
 import { betterAuth } from "better-auth";
 import { organization } from "better-auth/plugins";
-import Database from "better-sqlite3";
-import path from "path";
-
-const dbPath = path.join(process.cwd(), "k-fin-dev.db");
-const db = new Database(dbPath);
 
 export const auth = betterAuth({
-  database: db,
-  secret: process.env.BETTER_AUTH_SECRET!,
+  database: {
+    provider: "postgresql",
+    url: process.env.DATABASE_URL!,
+  },
+  secret: process.env.BETTER_AUTH_SECRET || "dev-secret-key-change-in-production",
   baseURL: process.env.NODE_ENV === "production" 
     ? process.env.NEXT_PUBLIC_APP_URL 
     : "http://localhost:3000",
-  logger: {
-    level: "debug",
-    disabled: false,
-  },
-  advanced: {
-    database: {
-      generateId: () => crypto.randomUUID(),
-    },
-  },
   plugins: [
     organization({
       allowUserToCreateOrganization: true,
@@ -35,27 +24,12 @@ export const auth = betterAuth({
     requireEmailVerification: false,
     minPasswordLength: 6,
     maxPasswordLength: 128,
-    sendResetPassword: async ({ user, url, token }, request) => {
-      // For development, we'll log the reset URL
-      // In production, you would send an email
-      console.log(`\n=== PASSWORD RESET REQUEST ===`);
-      console.log(`Email: ${user.email}`);
-      console.log(`Reset URL: ${url}`);
-      console.log(`Token: ${token}`);
-      console.log(`=== END PASSWORD RESET ===\n`);
-      
-      // For development, we can also store this in a simple way
-      // You can check your server console for the reset URL
-      return Promise.resolve();
-    },
-    resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       prompt: "select_account",
-      accessType: "offline",
       scope: [
         "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
@@ -80,6 +54,4 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
-});
-
-export type Session = typeof auth.$Infer.Session; 
+}); 

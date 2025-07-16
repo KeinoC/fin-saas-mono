@@ -1,5 +1,5 @@
 import { prisma } from './client';
-import { Account } from '@prisma/client';
+// import { any } from '@prisma/client';
 import { encrypt, decrypt } from './encryption';
 
 export interface CreateAcuityIntegrationData {
@@ -12,7 +12,7 @@ export interface CreateAcuityIntegrationData {
 
 export class AcuityIntegrationsService {
   
-  async create(data: CreateAcuityIntegrationData): Promise<Account> {
+  async create(data: CreateAcuityIntegrationData): Promise<any> {
     const {
       orgId,
       acuityUserId,
@@ -63,7 +63,7 @@ export class AcuityIntegrationsService {
     return integration;
   }
 
-  async findByOrg(orgId: string): Promise<Account | null> {
+  async findByOrg(orgId: string): Promise<any | null> {
     return prisma.account.findUnique({
       where: {
         orgId_source: {
@@ -74,7 +74,7 @@ export class AcuityIntegrationsService {
     });
   }
 
-  async updateLastSynced(orgId: string): Promise<Account | null> {
+  async updateLastSynced(orgId: string): Promise<any | null> {
     const integration = await this.findByOrg(orgId);
     if (!integration) return null;
 
@@ -145,7 +145,7 @@ export class AcuityIntegrationsService {
   }
 
   // Get integration that user can use (if they're member of the org)
-  async getUsableIntegration(userId: string, orgId: string): Promise<Account | null> {
+  async getUsableIntegration(userId: string, orgId: string): Promise<any | null> {
     const isMember = await this.checkOrgMembership(userId, orgId);
     if (!isMember) return null;
 

@@ -19,4 +19,14 @@ export const {
   getSession,
 } = authClient;
 
+// Export password reset methods
+export const resetPassword = authClient.resetPassword;
+
+// Debug: Check if methods are available
+if (typeof window !== 'undefined') {
+  console.log('[DEBUG] authClient methods available:', Object.keys(authClient));
+  console.log('[DEBUG] requestPasswordReset available:', !!authClient.requestPasswordReset);
+  console.log('[DEBUG] resetPassword available:', !!authClient.resetPassword);
+}
+
 export type Session = AuthSession; 

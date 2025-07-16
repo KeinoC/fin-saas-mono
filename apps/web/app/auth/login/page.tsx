@@ -4,13 +4,23 @@ import { LoginForm } from '@features/auth/components/login-form';
 import { BarChart3 } from 'lucide-react';
 import { useSession } from '@lib/auth-client';
 import { useAppStore } from '@lib/stores/app-store';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const { data: session, isPending } = useSession();
   const { currentOrg } = useAppStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Check for message in URL params
+    const msgParam = searchParams.get('message');
+    if (msgParam) {
+      setMessage(msgParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (session?.user) {
@@ -57,6 +67,13 @@ export default function LoginPage() {
             Sign in to your financial analysis platform
           </p>
         </div>
+        
+        {message && (
+          <div className="p-3 rounded-lg text-sm bg-green-50 text-green-800 border border-green-200">
+            {message}
+          </div>
+        )}
+        
         <LoginForm />
         <div className="text-center">
           <p className="text-xs text-gray-500">

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { signIn, signUp } from '@lib/auth-client';
 import { useAppStore } from '@lib/stores/app-store';
 import { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { ForgotPasswordForm } from './forgot-password-form';
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +14,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
   const { setUser, setLoading } = useAppStore();
@@ -50,11 +52,38 @@ export function LoginForm() {
           password,
           callbackURL: '/org/select',
         });
+        
         if (result.error) {
-          throw new Error(result.error.message);
+          // Check if user already exists
+          if (result.error.message?.includes('already exists') || 
+              result.error.message?.includes('already registered') ||
+              result.error.message?.includes('already taken')) {
+            // User already exists, try to sign them in instead
+            try {
+              const loginResult = await signIn.email({
+                email,
+                password,
+                callbackURL: '/org/select',
+              });
+              
+              if (loginResult.error) {
+                setError('User already exists but password is incorrect. Please check your password and try again.');
+              } else {
+                // Successfully logged in existing user
+                router.push('/org/select');
+                return;
+              }
+            } catch (loginError: any) {
+              setError('User already exists but password is incorrect. Please check your password and try again.');
+            }
+          } else {
+            throw new Error(result.error.message);
+          }
+        } else {
+          // New account created successfully
+          setError('Account created successfully! You can now sign in.');
+          setIsSignUp(false);
         }
-        setError('Account created successfully! You can now sign in.');
-        setIsSignUp(false);
       } else {
         const result = await signIn.email({
           email,
@@ -73,6 +102,10 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
+
+  if (showForgotPassword) {
+    return <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />;
+  }
 
   return (
     <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-xl shadow-lg">
@@ -184,6 +217,18 @@ export function LoginForm() {
               {isSignUp ? 'Create Account' : 'Sign In'}
             </button>
           </form>
+
+          {!isSignUp && (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-yellow-700 hover:text-yellow-800 font-medium"
+              >
+                Forgot your password?
+              </button>
+            </div>
+          )}
 
           <div className="text-center">
             <button

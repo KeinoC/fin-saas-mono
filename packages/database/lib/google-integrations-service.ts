@@ -1,8 +1,8 @@
 import { prisma } from './client';
-import { GoogleIntegration } from '@prisma/client';
+// import { any } from '@prisma/client';
 import { encrypt, decrypt } from './encryption';
 
-export interface CreateGoogleIntegrationData {
+export interface CreateanyData {
   orgId: string;
   userId?: string;
   authMethod: 'oauth' | 'service_account';
@@ -21,9 +21,9 @@ export interface CreateGoogleIntegrationData {
   credentials?: object;
 }
 
-export class GoogleIntegrationsService {
+export class anysService {
   
-  async create(data: CreateGoogleIntegrationData): Promise<GoogleIntegration> {
+  async create(data: CreateanyData): Promise<any> {
     const {
       orgId,
       userId,
@@ -64,13 +64,13 @@ export class GoogleIntegrationsService {
     return integration;
   }
 
-  async findById(id: string): Promise<GoogleIntegration | null> {
+  async findById(id: string): Promise<any | null> {
     return prisma.googleIntegration.findUnique({
       where: { id, isActive: true },
     });
   }
 
-  async findByOrg(orgId: string): Promise<GoogleIntegration[]> {
+  async findByOrg(orgId: string): Promise<any[]> {
     return prisma.googleIntegration.findMany({
       where: { 
         orgId,
@@ -83,7 +83,7 @@ export class GoogleIntegrationsService {
   async findByOrgAndMethod(
     orgId: string, 
     authMethod: 'oauth' | 'service_account'
-  ): Promise<GoogleIntegration[]> {
+  ): Promise<any[]> {
     return prisma.googleIntegration.findMany({
       where: { 
         orgId,
@@ -94,7 +94,7 @@ export class GoogleIntegrationsService {
     });
   }
 
-  async updateLastUsed(id: string): Promise<GoogleIntegration | null> {
+  async updateLastUsed(id: string): Promise<any | null> {
     return prisma.googleIntegration.update({
       where: { id },
       data: { lastUsedAt: new Date() },
@@ -106,7 +106,7 @@ export class GoogleIntegrationsService {
     accessToken: string, 
     refreshToken?: string,
     expiryDate?: Date
-  ): Promise<GoogleIntegration | null> {
+  ): Promise<any | null> {
     const encryptedAccessToken = await encrypt(accessToken);
     const encryptedRefreshToken = refreshToken ? await encrypt(refreshToken) : undefined;
 
@@ -120,7 +120,7 @@ export class GoogleIntegrationsService {
     });
   }
 
-  async deactivate(id: string): Promise<GoogleIntegration | null> {
+  async deactivate(id: string): Promise<any | null> {
     return prisma.googleIntegration.update({
       where: { id },
       data: { isActive: false },
@@ -171,7 +171,7 @@ export class GoogleIntegrationsService {
   }
 
   // Get integrations that user can use (admin integrations for their orgs)
-  async getUsableIntegrations(userId: string, orgId: string): Promise<GoogleIntegration[]> {
+  async getUsableIntegrations(userId: string, orgId: string): Promise<any[]> {
     const isMember = await this.checkOrgMembership(userId, orgId);
     if (!isMember) return [];
 
@@ -179,4 +179,4 @@ export class GoogleIntegrationsService {
   }
 }
 
-export const googleIntegrationsService = new GoogleIntegrationsService(); 
+export const googleIntegrationsService = new anysService(); 

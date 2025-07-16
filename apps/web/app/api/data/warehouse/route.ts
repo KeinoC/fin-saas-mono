@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     // Process the aggregated data to create data source summaries
     const sourceMap = new Map();
 
-    sourceStats.forEach(stat => {
+    sourceStats.forEach((stat: any) => {
       const sourceKey = stat.source;
       
       if (!sourceMap.has(sourceKey)) {

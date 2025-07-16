@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, DataType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const orgId = searchParams.get('orgId') || 'test-org-id';
   const startDate = searchParams.get('startDate') ? new Date(searchParams.get('startDate')!) : new Date(new Date().getFullYear(), 0, 1);
   const endDate = searchParams.get('endDate') ? new Date(searchParams.get('endDate')!) : new Date();
-  const dataTypes = (searchParams.get('dataTypes')?.split(',') as DataType[]) || [DataType.ACTUAL];
+  const dataTypes = (searchParams.get('dataTypes')?.split(',') || ['ACTUAL']) as ('ACTUAL' | 'BUDGET' | 'FORECAST')[];
 
   try {
     const data = await prisma.transformedData.findMany({

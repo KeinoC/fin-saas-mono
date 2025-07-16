@@ -1,5 +1,5 @@
 import { prisma } from './client';
-import { Account, GoogleIntegration, IntegrationSource } from '@prisma/client';
+// import { any, any, string } from '@prisma/client';
 import { acuityIntegrationsService } from './acuity-integrations-service';
 import { googleIntegrationsService } from './google-integrations-service';
 
@@ -154,14 +154,14 @@ export class DataRetrievalService {
   /**
    * Get available data types for an integration
    */
-  getAvailableDataTypes(integrationSource: IntegrationSource | 'google'): string[] {
+  getAvailableDataTypes(integrationSource: string | 'google'): string[] {
     return this.dataCapabilities[integrationSource]?.supportedTypes || [];
   }
 
   /**
    * Get default data type for an integration
    */
-  getDefaultDataType(integrationSource: IntegrationSource | 'google'): string {
+  getDefaultDataType(integrationSource: string | 'google'): string {
     return this.dataCapabilities[integrationSource]?.defaultType || 'data';
   }
 
@@ -198,16 +198,16 @@ export class DataRetrievalService {
     return null;
   }
 
-  private async getAllOrgIntegrations(orgId: string): Promise<Array<{id: string, source: IntegrationSource | 'google', name: string}>> {
-    const integrations: Array<{id: string, source: IntegrationSource | 'google', name: string}> = [];
+  private async getAllOrgIntegrations(orgId: string): Promise<Array<{id: string, source: string | 'google', name: string}>> {
+    const integrations: Array<{id: string, source: string | 'google', name: string}> = [];
     
     try {
-      // Get Account-based integrations
+      // Get any-based integrations
       const accounts = await prisma.account.findMany({
         where: { orgId },
       });
       
-      integrations.push(...accounts.map(account => ({
+      integrations.push(...accounts.map((account: any) => ({
         id: account.id,
         source: account.source,
         name: account.displayName || `${account.source} Integration`
