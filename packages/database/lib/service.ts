@@ -166,7 +166,7 @@ export class DatabaseService {
   static async getAccount(orgId: string, source: string) {
     return await prisma.account.findUnique({
       where: { 
-        orgId_source: { orgId, source: source as string }
+        orgId_source: { orgId, source: source as any }
       },
       include: { organization: true }
     })
