@@ -99,7 +99,7 @@ class ProductionValidator {
     await this.runCommand('npm run type-check', 'TypeScript type checking')
     
     try {
-      await this.runCommand('npm run format -- --check', 'Code formatting check', { critical: false })
+      await this.runCommand('npx biome check', 'Code formatting check', { critical: false })
     } catch (error) {
       this.log('Code formatting issues found - consider running npm run format', 'warning')
     }

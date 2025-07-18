@@ -6,7 +6,7 @@ const createJestConfig = nextJest({
 
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/apps/web/$1',
     '^@components/(.*)$': '<rootDir>/apps/web/components/$1',
     '^@features/(.*)$': '<rootDir>/apps/web/features/$1',
@@ -17,6 +17,9 @@ const customJestConfig = {
     '^services$': '<rootDir>/packages/services',
   },
   testEnvironment: 'jest-environment-jsdom',
+  testEnvironmentOptions: {
+    url: 'http://localhost:3000'
+  },
   testMatch: [
     '<rootDir>/tests/**/*.test.(js|jsx|ts|tsx)',
     '<rootDir>/apps/**/*.test.(js|jsx|ts|tsx)',

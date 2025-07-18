@@ -3,14 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { useRouter } from 'next/navigation'
 import { LoginForm } from '@features/auth/components/login-form'
 
-const mockSignIn = {
-  email: jest.fn(),
-}
-
-const mockSignUp = {
-  email: jest.fn(),
-}
-
+const mockSignIn = jest.fn()
+const mockSignUp = jest.fn()
 const mockPush = jest.fn()
 
 jest.mock('next/navigation', () => ({
@@ -19,12 +13,12 @@ jest.mock('next/navigation', () => ({
   })),
 }))
 
-jest.mock('@lib/auth-client', () => ({
+jest.mock('@/lib/auth-client', () => ({
   signIn: {
-    email: mockSignIn.email,
+    email: mockSignIn,
   },
   signUp: {
-    email: mockSignUp.email,
+    email: mockSignUp,
   },
 }))
 
