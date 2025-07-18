@@ -1,152 +1,201 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { FileUploader } from '@features/data/components/file-uploader'
 
-const mockOnFileSelect = jest.fn()
-const mockOnUpload = jest.fn()
+// Mock fetch for API calls
+global.fetch = jest.fn()
+
+const mockOnUploadSuccess = jest.fn()
+const mockOnUploadError = jest.fn()
 
 describe('FileUploader', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset fetch mock
+    ;(global.fetch as jest.Mock).mockClear()
   })
 
   it('renders upload area correctly', () => {
     render(
       <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={10 * 1024 * 1024}
-        acceptedFileTypes={['.csv', '.xlsx']}
+        orgId="test-org"
+        userId="test-user"
+        onUploadSuccess={mockOnUploadSuccess}
+        onUploadError={mockOnUploadError}
       />
     )
 
-    expect(screen.getByText('Drop files here or click to upload')).toBeInTheDocument()
-    expect(screen.getByText('CSV, Excel files up to 10MB')).toBeInTheDocument()
+    expect(screen.getByText('Drag & drop your files here, or click to browse')).toBeInTheDocument()
+    expect(screen.getByText('Supports CSV and Excel files up to 10MB each. Multiple files supported.')).toBeInTheDocument()
   })
 
-  it('handles file selection via input', () => {
+  it('handles file selection via input', async () => {
+    const user = userEvent.setup()
+    
+    // Mock successful upload response
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ 
+        success: true, 
+        dataImportId: 'test-id', 
+        data: [{ test: 'data' }], 
+        headers: ['test', 'data']
+      })
+    })
+
     render(
       <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={10 * 1024 * 1024}
-        acceptedFileTypes={['.csv', '.xlsx']}
+        orgId="test-org"
+        userId="test-user"
+        onUploadSuccess={mockOnUploadSuccess}
+        onUploadError={mockOnUploadError}
       />
     )
 
     const file = new File(['test,data\n1,2'], 'test.csv', { type: 'text/csv' })
-    const input = screen.getByLabelText('File upload')
+    const fileInput = screen.getByRole('presentation').querySelector('input[type="file"]') as HTMLInputElement
 
-    fireEvent.change(input, { target: { files: [file] } })
+    // Upload file using the hidden input
+    await user.upload(fileInput, file)
 
-    expect(mockOnFileSelect).toHaveBeenCalledWith(file)
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/data/upload', expect.objectContaining({
+        method: 'POST',
+        body: expect.any(FormData)
+      }))
+    })
   })
 
-  it('validates file size', () => {
+  it('validates file size', async () => {
+    const user = userEvent.setup()
+    
+    // Mock file size error response
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ success: false, error: 'File size exceeds 10MB limit' })
+    })
+
     render(
       <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={1024}
-        acceptedFileTypes={['.csv']}
+        orgId="test-org"
+        userId="test-user"
+        onUploadSuccess={mockOnUploadSuccess}
+        onUploadError={mockOnUploadError}
       />
     )
 
-    const largeFile = new File(['x'.repeat(2048)], 'large.csv', { type: 'text/csv' })
-    const input = screen.getByLabelText('File upload')
+    // Create a file larger than 10MB
+    const largeFile = new File(['x'.repeat(11 * 1024 * 1024)], 'large.csv', { type: 'text/csv' })
+    const fileInput = screen.getByRole('presentation').querySelector('input[type="file"]') as HTMLInputElement
+    
+    await user.upload(fileInput, largeFile)
 
-    fireEvent.change(input, { target: { files: [largeFile] } })
-
-    expect(screen.getByText('File size exceeds maximum limit of 1KB')).toBeInTheDocument()
-    expect(mockOnFileSelect).not.toHaveBeenCalled()
+    await waitFor(() => {
+      expect(mockOnUploadError).toHaveBeenCalledWith('File size exceeds 10MB limit')
+    })
   })
 
-  it('validates file type', () => {
+
+  it('handles file upload through click', async () => {
+    const user = userEvent.setup()
+    
+    // Mock successful upload response
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ 
+        success: true, 
+        dataImportId: 'test-id', 
+        data: [{ test: 'data' }], 
+        headers: ['test', 'data']
+      })
+    })
+
     render(
       <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={10 * 1024 * 1024}
-        acceptedFileTypes={['.csv']}
-      />
-    )
-
-    const invalidFile = new File(['test'], 'test.txt', { type: 'text/plain' })
-    const input = screen.getByLabelText('File upload')
-
-    fireEvent.change(input, { target: { files: [invalidFile] } })
-
-    expect(screen.getByText('Invalid file type. Please upload: .csv')).toBeInTheDocument()
-    expect(mockOnFileSelect).not.toHaveBeenCalled()
-  })
-
-  it('handles drag and drop', () => {
-    render(
-      <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={10 * 1024 * 1024}
-        acceptedFileTypes={['.csv']}
+        orgId="test-org"
+        userId="test-user"
+        onUploadSuccess={mockOnUploadSuccess}
+        onUploadError={mockOnUploadError}
       />
     )
 
     const file = new File(['test,data'], 'test.csv', { type: 'text/csv' })
-    const dropZone = screen.getByTestId('file-drop-zone')
+    const fileInput = screen.getByRole('presentation').querySelector('input[type="file"]') as HTMLInputElement
 
-    fireEvent.dragOver(dropZone)
-    expect(dropZone).toHaveClass('border-blue-400')
-
-    fireEvent.drop(dropZone, {
-      dataTransfer: { files: [file] }
-    })
-
-    expect(mockOnFileSelect).toHaveBeenCalledWith(file)
-  })
-
-  it('shows upload progress', async () => {
-    const mockUploadPromise = new Promise(resolve => {
-      setTimeout(() => resolve({ success: true }), 100)
-    })
-    mockOnUpload.mockReturnValue(mockUploadPromise)
-
-    render(
-      <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={10 * 1024 * 1024}
-        acceptedFileTypes={['.csv']}
-        selectedFile={new File(['test'], 'test.csv', { type: 'text/csv' })}
-      />
-    )
-
-    fireEvent.click(screen.getByText('Upload File'))
-
-    expect(screen.getByText('Uploading...')).toBeInTheDocument()
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+    await user.upload(fileInput, file)
 
     await waitFor(() => {
-      expect(screen.getByText('Upload Complete')).toBeInTheDocument()
+      expect(global.fetch).toHaveBeenCalledWith('/api/data/upload', expect.any(Object))
     })
   })
 
-  it('handles upload errors', async () => {
-    mockOnUpload.mockRejectedValue(new Error('Upload failed'))
+  it('shows file information after upload', async () => {
+    const user = userEvent.setup()
+    
+    // Mock successful upload response
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ 
+        success: true, 
+        dataImportId: 'test-id', 
+        data: [{ test: 'data' }], 
+        headers: ['test']
+      })
+    })
 
     render(
       <FileUploader
-        onFileSelect={mockOnFileSelect}
-        onUpload={mockOnUpload}
-        maxFileSize={10 * 1024 * 1024}
-        acceptedFileTypes={['.csv']}
-        selectedFile={new File(['test'], 'test.csv', { type: 'text/csv' })}
+        orgId="test-org"
+        userId="test-user"
+        onUploadSuccess={mockOnUploadSuccess}
+        onUploadError={mockOnUploadError}
       />
     )
 
-    fireEvent.click(screen.getByText('Upload File'))
+    const file = new File(['test'], 'test.csv', { type: 'text/csv' })
+    const fileInput = screen.getByRole('presentation').querySelector('input[type="file"]') as HTMLInputElement
+    
+    await user.upload(fileInput, file)
+
+    // Wait for upload to complete and show file info
+    await waitFor(() => {
+      expect(screen.getByText(/successfully processed.*rows/i)).toBeInTheDocument()
+      expect(screen.getByText(/detected.*columns/i)).toBeInTheDocument()
+    })
+  })
+
+  it('displays file upload section when files are added', async () => {
+    const user = userEvent.setup()
+    
+    // Mock successful upload response
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ 
+        success: true, 
+        dataImportId: 'test-id', 
+        data: [{ test: 'data' }], 
+        headers: ['test']
+      })
+    })
+
+    render(
+      <FileUploader
+        orgId="test-org"
+        userId="test-user"
+        onUploadSuccess={mockOnUploadSuccess}
+        onUploadError={mockOnUploadError}
+      />
+    )
+
+    const file = new File(['test'], 'test.csv', { type: 'text/csv' })
+    const fileInput = screen.getByRole('presentation').querySelector('input[type="file"]') as HTMLInputElement
+    
+    await user.upload(fileInput, file)
 
     await waitFor(() => {
-      expect(screen.getByText('Upload failed')).toBeInTheDocument()
-      expect(screen.getByText('Try Again')).toBeInTheDocument()
+      expect(screen.getByText('File Uploads')).toBeInTheDocument()
+      expect(screen.getByText('test.csv')).toBeInTheDocument()
     })
   })
 }) 

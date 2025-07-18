@@ -35,6 +35,14 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const uploadFile = async (fileUpload: FileUpload) => {
+    console.log('=== Starting file upload ===', {
+      fileName: fileUpload.file.name,
+      fileSize: fileUpload.file.size,
+      fileType: fileUpload.file.type,
+      orgId,
+      userId
+    });
+
     setUploads(prev => 
       prev.map(upload => 
         upload.id === fileUpload.id 
@@ -69,7 +77,14 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
 
       const data = await response.json();
 
+      console.log('Upload API response:', {
+        status: response.status,
+        ok: response.ok,
+        data
+      });
+
       if (!response.ok) {
+        console.error('Upload failed:', data);
         throw new Error(data.error || 'Upload failed');
       }
 
@@ -80,14 +95,22 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
                 ...upload, 
                 status: 'success', 
                 progress: 100, 
-                result: { ...data.dataImport, filename: fileUpload.file.name } 
+                result: { 
+                  id: data.dataImportId, 
+                  filename: fileUpload.file.name, 
+                  rowCount: data.data?.length || 0, 
+                  columns: data.headers || [], 
+                  preview: data.data?.slice(0, 5) || [] 
+                } 
               }
             : upload
         )
       );
 
-      onUploadSuccess?.(data.dataImport);
+      console.log('=== Upload completed successfully ===');
+      onUploadSuccess?.(data);
     } catch (err) {
+      console.error('=== Upload failed ===', err);
       const errorMessage = err instanceof Error ? err.message : 'Upload failed';
       setUploads(prev => 
         prev.map(upload => 
@@ -161,8 +184,26 @@ export function FileUploader({ orgId, userId, onUploadSuccess, onUploadError }: 
     }
   };
 
+  const onDropRejected = useCallback((fileRejections: any[]) => {
+    fileRejections.forEach((rejection) => {
+      const { file, errors } = rejection;
+      const errorMessages = errors.map((e: any) => {
+        if (e.code === 'file-too-large') {
+          return 'File size exceeds 10MB limit';
+        }
+        if (e.code === 'file-invalid-type') {
+          return 'Invalid file type. Please upload CSV files only.';
+        }
+        return e.message;
+      });
+      
+      onUploadError?.(errorMessages[0] || 'File validation failed');
+    });
+  }, [onUploadError]);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     accept: {
       'text/csv': ['.csv'],
       'application/vnd.ms-excel': ['.xls'],
