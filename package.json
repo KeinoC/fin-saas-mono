@@ -37,7 +37,8 @@
     "db:init": "npx tsx scripts/init-sqlite.ts",
     "db:seed": "npx tsx scripts/seed-development.ts",
     "db:test-connection": "npx tsx scripts/test-seed-connection.ts",
-    "dev:setup": "npx tsx scripts/setup-dev-environment.ts"
+    "dev:setup": "npx tsx scripts/setup-dev-environment.ts",
+    "dev:create-user": "npx tsx scripts/create-dev-user-better-auth.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

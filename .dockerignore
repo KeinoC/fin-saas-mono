@@ -1,0 +1,156 @@
+# K-Fin Docker Build Context Ignore File
+# Optimizes Docker build performance by excluding unnecessary files
+
+# ================================
+# Development and Documentation
+# ================================
+*.md
+!README.md
+*.log
+.git/
+.gitignore
+.gitattributes
+
+# Environment files (except examples)
+.env*
+!.env.example
+
+# ================================
+# Dependencies
+# ================================
+# Will be installed in container
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ================================
+# IDE and Editor Files
+# ================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+*~
+
+# ================================
+# OS Generated Files
+# ================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ================================
+# Build Outputs
+# ================================
+.next/
+dist/
+build/
+out/
+coverage/
+.turbo/
+.cache/
+
+# ================================
+# Testing
+# ================================
+cypress/
+tests/cypress/videos/
+tests/cypress/screenshots/
+tests/coverage/
+.nyc_output/
+junit.xml
+
+# ================================
+# Docker Files (avoid recursion)
+# ================================
+docker-scripts/
+plans/docker-setup/
+
+# ================================
+# Deployment and CI/CD
+# ================================
+.vercel/
+.netlify/
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# ================================
+# Database Files
+# ================================
+*.db
+*.sqlite
+*.sqlite3
+k-fin-dev*.db
+*.db-journal
+
+# ================================
+# Temporary Files
+# ================================
+tmp/
+temp/
+*.tmp
+*.temp
+.temporary/
+
+# ================================
+# Cache Directories
+# ================================
+.npm/
+.yarn/
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# ================================
+# Log Files
+# ================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ================================
+# Coverage Directory
+# ================================
+lib-cov/
+coverage/
+.nyc_output/
+.coverage/
+
+# ================================
+# Scripts (keep only necessary ones)
+# ================================
+scripts/
+!scripts/setup-*.js
+!scripts/build-*.js
+
+# ================================
+# Documentation
+# ================================
+docs/
+*.pdf
+*.doc
+*.docx
+
+# ================================
+# Archives
+# ================================
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z

@@ -1,0 +1,320 @@
+# K-Fin Docker Build Context Ignore File
+# Optimizes Docker build performance by excluding unnecessary files
+
+# ================================
+# Development and Documentation
+# ================================
+*.md
+!README.md
+*.log
+.git/
+.gitignore
+.gitattributes
+
+# Environment files (except examples)
+.env*
+!.env.example
+
+# ================================
+# Dependencies
+# ================================
+# Will be installed in container
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Package manager lock files (keep for Docker)
+# package-lock.json - KEEP
+# yarn.lock - KEEP
+# pnpm-lock.yaml - KEEP
+
+# ================================
+# IDE and Editor Files
+# ================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+*~
+
+# ================================
+# OS Generated Files
+# ================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ================================
+# Build Outputs
+# ================================
+.next/
+dist/
+build/
+out/
+coverage/
+.turbo/
+.cache/
+
+# ================================
+# Testing
+# ================================
+cypress/
+tests/cypress/videos/
+tests/cypress/screenshots/
+tests/coverage/
+.nyc_output/
+junit.xml
+
+# ================================
+# Docker Files (avoid recursion)
+# ================================
+Dockerfile*
+docker-compose*
+.docker/
+docker-scripts/
+plans/docker-setup/
+
+# ================================
+# Deployment and CI/CD
+# ================================
+.vercel/
+.netlify/
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# ================================
+# Database Files
+# ================================
+*.db
+*.sqlite
+*.sqlite3
+k-fin-dev*.db
+*.db-journal
+
+# ================================
+# Temporary Files
+# ================================
+tmp/
+temp/
+*.tmp
+*.temp
+.temporary/
+
+# ================================
+# Cache Directories
+# ================================
+.npm/
+.yarn/
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# ================================
+# Log Files
+# ================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ================================
+# Runtime Data
+# ================================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ================================
+# Coverage Directory
+# ================================
+lib-cov/
+coverage/
+.nyc_output/
+.coverage/
+
+# ================================
+# Dependency Directories
+# ================================
+jspm_packages/
+web_modules/
+
+# ================================
+# Optional npm cache directory
+# ================================
+.npm/
+
+# ================================
+# Optional eslint cache
+# ================================
+.eslintcache
+
+# ================================
+# Microbundle cache
+# ================================
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ================================
+# Optional REPL history
+# ================================
+.node_repl_history
+
+# ================================
+# Output of 'npm pack'
+# ================================
+*.tgz
+
+# ================================
+# Yarn Integrity file
+# ================================
+.yarn-integrity
+
+# ================================
+# Stores VSCode versions used for testing VSCode extensions
+# ================================
+.vscode-test/
+
+# ================================
+# Yarn v2
+# ================================
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ================================
+# Storybook build outputs
+# ================================
+.out/
+.storybook-out/
+
+# ================================
+# Temporary folders
+# ================================
+.tmp/
+.temp/
+
+# ================================
+# Editor backup files
+# ================================
+*~
+*.bak
+*.backup
+*.orig
+
+# ================================
+# Security and Sensitive Files
+# ================================
+.env.local
+.env.*.local
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+
+# ================================
+# Terraform
+# ================================
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+
+# ================================
+# Scripts (keep only necessary ones)
+# ================================
+scripts/
+!scripts/setup-*.js
+!scripts/build-*.js
+
+# ================================
+# Documentation
+# ================================
+docs/
+*.pdf
+*.doc
+*.docx
+
+# ================================
+# Archives
+# ================================
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# ================================
+# Media Files (unless needed)
+# ================================
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
+# Large images (keep only necessary ones)
+*.psd
+*.ai
+*.sketch
+
+# ================================
+# Development Utilities
+# ================================
+.prettierrc*
+.eslintrc*
+.babelrc*
+.editorconfig
+.gitpod.yml
+.gitpod.dockerfile
+
+# ================================
+# Performance Monitoring
+# ================================
+.clinic/
+.0x/
+
+# ================================
+# Kubernetes
+# ================================
+*.yaml
+*.yml
+!docker-compose*.yml
+
+# ================================
+# Helm Charts
+# ================================
+charts/
+templates/
+
+# ================================
+# Keep Important Files
+# ================================
+# !package.json           # KEEP - Required for dependencies
+# !package-lock.json      # KEEP - Required for exact versions
+# !turbo.json            # KEEP - Required for monorepo builds
+# !next.config.js        # KEEP - Required for Next.js configuration
+# !tsconfig.json         # KEEP - Required for TypeScript
+# !tailwind.config.js    # KEEP - Required for Tailwind CSS
+# !postcss.config.js     # KEEP - Required for PostCSS
+# !prisma/schema.prisma  # KEEP - Required for database schema

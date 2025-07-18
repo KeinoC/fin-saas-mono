@@ -1,0 +1,112 @@
+# Production Testing Docker Compose for K-Fin
+# Test production builds locally
+
+version: '3.8'
+
+services:
+  # Production app build
+  app:
+    build:
+      context: ../../..
+      dockerfile: plans/docker-setup/dockerfile-templates/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-}
+        VCS_REF: ${VCS_REF:-}
+        VERSION: ${VERSION:-latest}
+    container_name: k-fin-app-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/k_fin_prod
+      - DIRECT_URL=postgresql://postgres:postgres@database:5432/k_fin_prod
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-production-secret-key}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM:-K-Fin <noreply@k-fin.com>}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - NEXT_TELEMETRY_DISABLED=1
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - k-fin-prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # PostgreSQL database for production testing
+  database:
+    image: postgres:15-alpine
+    container_name: k-fin-database-prod
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts
+    environment:
+      - POSTGRES_DB=k_fin_prod
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - k-fin-postgres-prod-data:/var/lib/postgresql/data
+    networks:
+      - k-fin-prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d k_fin_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for production testing
+  redis:
+    image: redis:7-alpine
+    container_name: k-fin-redis-prod
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - k-fin-redis-prod-data:/data
+    networks:
+      - k-fin-prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Nginx for production-like load balancing
+  nginx:
+    image: nginx:alpine
+    container_name: k-fin-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../scripts/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../scripts/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - k-fin-prod-network
+    restart: unless-stopped
+
+# Named volumes for production testing
+volumes:
+  k-fin-postgres-prod-data:
+    driver: local
+  k-fin-redis-prod-data:
+    driver: local
+
+# Production network
+networks:
+  k-fin-prod-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

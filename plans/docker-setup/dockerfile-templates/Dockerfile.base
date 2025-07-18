@@ -1,0 +1,47 @@
+# Base Dockerfile for K-Fin
+# Shared base image for consistent environment across all containers
+
+FROM node:20-alpine
+
+# Install system dependencies required for native modules
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    musl-dev \
+    giflib-dev \
+    pixman-dev \
+    pangomm-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    git \
+    curl \
+    bash \
+    openssl
+
+# Set working directory
+WORKDIR /app
+
+# Enable corepack for modern package management
+RUN corepack enable
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 --ingroup nodejs nextjs
+
+# Install global tools
+RUN npm install -g turbo prisma
+
+# Set default environment variables
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Default user
+USER nextjs
+
+# Default command
+CMD ["node"]

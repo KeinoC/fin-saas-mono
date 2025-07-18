@@ -1,0 +1,94 @@
+# CI/CD Docker Compose for K-Fin
+# Optimized for testing and continuous integration
+
+version: '3.8'
+
+services:
+  # Application for testing
+  app:
+    build:
+      context: ../../..
+      dockerfile: plans/docker-setup/dockerfile-templates/Dockerfile
+      target: builder  # Use builder stage for testing
+    container_name: k-fin-app-ci
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/k_fin_test
+      - DIRECT_URL=postgresql://postgres:postgres@database:5432/k_fin_test
+      - BETTER_AUTH_SECRET=test-secret-key
+      - BETTER_AUTH_URL=http://localhost:3000
+      - NEXT_TELEMETRY_DISABLED=1
+      - CI=true
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - k-fin-ci-network
+    command: |
+      sh -c "
+        echo 'Running CI tests...' &&
+        npm run lint &&
+        npm run type-check &&
+        npm run test:coverage &&
+        npm run test:build
+      "
+
+  # PostgreSQL for testing
+  database:
+    image: postgres:15-alpine
+    container_name: k-fin-database-ci
+    environment:
+      - POSTGRES_DB=k_fin_test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    tmpfs:
+      - /var/lib/postgresql/data:rw,noexec,nosuid,size=1g
+    networks:
+      - k-fin-ci-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d k_fin_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # E2E testing service
+  e2e:
+    build:
+      context: ../../..
+      dockerfile: plans/docker-setup/dockerfile-templates/Dockerfile.dev
+    container_name: k-fin-e2e-ci
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/k_fin_test
+      - DIRECT_URL=postgresql://postgres:postgres@database:5432/k_fin_test
+      - BETTER_AUTH_SECRET=test-secret-key
+      - BETTER_AUTH_URL=http://app:3000
+      - CYPRESS_baseUrl=http://app:3000
+      - CI=true
+    depends_on:
+      - app
+      - database
+    networks:
+      - k-fin-ci-network
+    volumes:
+      - ../../../tests/cypress:/app/tests/cypress
+      - k-fin-cypress-cache:/root/.cache/Cypress
+    command: |
+      sh -c "
+        echo 'Waiting for app to be ready...' &&
+        sleep 30 &&
+        npm run test:e2e
+      "
+    profiles:
+      - e2e
+
+# Named volumes for CI
+volumes:
+  k-fin-cypress-cache:
+    driver: local
+
+# CI network
+networks:
+  k-fin-ci-network:
+    driver: bridge

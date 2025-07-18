@@ -1,0 +1,78 @@
+# Development Dockerfile for K-Fin
+# Optimized for development workflow with hot reload
+
+FROM node:20-alpine
+
+# Install system dependencies required for native modules and development tools
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    musl-dev \
+    giflib-dev \
+    pixman-dev \
+    pangomm-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    git \
+    curl \
+    bash
+
+# Set working directory
+WORKDIR /app
+
+# Enable corepack for modern package management
+RUN corepack enable
+
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/database/package.json ./packages/database/
+COPY packages/config/package.json ./packages/config/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/services/package.json ./packages/services/
+COPY packages/integrations/package.json ./packages/integrations/
+
+# Install dependencies
+RUN npm ci
+
+# Copy the rest of the source code
+COPY . .
+
+# Generate Prisma client
+WORKDIR /app/packages/database
+RUN npx prisma generate
+
+# Return to app root
+WORKDIR /app
+
+# Create non-root user for development
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 --ingroup nodejs nextjs
+
+# Change ownership of the app directory
+RUN chown -R nextjs:nodejs /app
+
+# Switch to non-root user
+USER nextjs
+
+# Expose ports
+EXPOSE 3000
+EXPOSE 9229
+
+# Environment variables for development
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV CHOKIDAR_USEPOLLING=true
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:3000 || exit 1
+
+# Start development server with Turbo
+WORKDIR /app
+CMD ["npm", "run", "dev"]
