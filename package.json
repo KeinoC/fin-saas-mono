@@ -50,7 +50,8 @@
     "papaparse": "^5.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-dropzone": "^14.3.8"
+    "react-dropzone": "^14.3.8",
+    "resend": "^4.7.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.0",

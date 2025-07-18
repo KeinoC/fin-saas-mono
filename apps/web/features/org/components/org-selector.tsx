@@ -51,16 +51,16 @@ export function OrgSelector() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           className="flex items-center gap-2 w-full justify-between min-w-[180px]"
-      >
+        >
           <div className="flex items-center gap-2">
             <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             <span className="flex-1 text-left truncate font-medium">
-          {currentOrg?.name}
-        </span>
+              {currentOrg?.name}
+            </span>
           </div>
           <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </Button>

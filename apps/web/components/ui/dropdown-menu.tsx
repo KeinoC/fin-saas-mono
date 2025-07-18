@@ -41,15 +41,36 @@ const DropdownMenu = ({ children }: DropdownMenuProps) => {
 
 const DropdownMenuTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, children, ...props }, ref) => {
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    asChild?: boolean
+  }
+>(({ className, children, asChild = false, onClick, ...props }, ref) => {
   const { open, setOpen } = useDropdownMenu()
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setOpen(!open)
+    if (onClick) {
+      onClick(e)
+    }
+  }
+
+  if (asChild && React.isValidElement(children)) {
+    // For asChild, we wrap the child and pass click handling through a div
+    return (
+      <div
+        onClick={() => setOpen(!open)}
+        className={cn("inline-flex", className)}
+      >
+        {children}
+      </div>
+    )
+  }
 
   return (
     <button
       ref={ref}
       className={cn("inline-flex items-center justify-center", className)}
-      onClick={() => setOpen(!open)}
+      onClick={handleClick}
       {...props}
     >
       {children}

@@ -3,6 +3,7 @@ import { organization } from "better-auth/plugins";
 import Database from "better-sqlite3";
 import { Pool } from "pg";
 import path from "path";
+import { EmailService } from "./email";
 
 // Use PostgreSQL in production, SQLite in development
 const getDatabaseConfig = () => {
@@ -53,18 +54,19 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 6,
     maxPasswordLength: 128,
-    sendResetPassword: async ({ user, url, token }) => {
-      // For development, we'll log the reset URL
-      // In production, you would send an email
-      console.log(`\n=== PASSWORD RESET REQUEST ===`);
-      console.log(`Email: ${user.email}`);
-      console.log(`Reset URL: ${url}`);
-      console.log(`Token: ${token}`);
-      console.log(`=== END PASSWORD RESET ===\n`);
-      
-      // For development, we can also store this in a simple way
-      // You can check your server console for the reset URL
-      return Promise.resolve();
+    sendResetPassword: async ({ user, url }) => {
+      try {
+        await EmailService.sendPasswordResetEmail(
+          user.email,
+          url,
+          user.name
+        );
+        console.log(`Password reset email sent to: ${user.email}`);
+      } catch (error) {
+        console.error('Failed to send password reset email:', error);
+        // Don't throw error to avoid breaking the password reset flow
+        // In production, you might want to log this to a monitoring service
+      }
     },
     resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
