@@ -3,9 +3,10 @@ import { organizationClient } from "better-auth/client/plugins";
 import type { Session as AuthSession } from "./auth";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NODE_ENV === "production" 
-    ? process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com"
-    : "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || 
+    (process.env.NODE_ENV === "production" 
+      ? process.env.NEXT_PUBLIC_APP_URL || "https://k-fin-ten.vercel.app"
+      : "http://localhost:3000"),
   plugins: [
     organizationClient()
   ],

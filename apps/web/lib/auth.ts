@@ -27,9 +27,10 @@ const getDatabaseConfig = () => {
 export const auth = betterAuth({
   ...getDatabaseConfig(),
   secret: process.env.BETTER_AUTH_SECRET!,
-  baseURL: process.env.NODE_ENV === "production" 
-    ? process.env.NEXT_PUBLIC_APP_URL 
-    : "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || 
+    (process.env.NODE_ENV === "production" 
+      ? process.env.NEXT_PUBLIC_APP_URL 
+      : "http://localhost:3000"),
   logger: {
     level: "debug",
     disabled: false,
@@ -50,10 +51,9 @@ export const auth = betterAuth({
   ],
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
     minPasswordLength: 6,
     maxPasswordLength: 128,
-    sendResetPassword: async ({ user, url, token }, request) => {
+    sendResetPassword: async ({ user, url, token }) => {
       // For development, we'll log the reset URL
       // In production, you would send an email
       console.log(`\n=== PASSWORD RESET REQUEST ===`);
