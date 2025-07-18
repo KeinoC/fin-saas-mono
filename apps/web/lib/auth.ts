@@ -1,13 +1,31 @@
 import { betterAuth } from "better-auth";
 import { organization } from "better-auth/plugins";
 import Database from "better-sqlite3";
+import { Pool } from "pg";
 import path from "path";
 
-const dbPath = path.join(process.cwd(), "k-fin-dev.db");
-const db = new Database(dbPath);
+// Use PostgreSQL in production, SQLite in development
+const getDatabaseConfig = () => {
+  if (process.env.NODE_ENV === "production") {
+    return {
+      database: new Pool({
+        connectionString: process.env.DATABASE_URL!,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }),
+    };
+  } else {
+    const dbPath = path.join(process.cwd(), "k-fin-dev.db");
+    const db = new Database(dbPath);
+    return {
+      database: db,
+    };
+  }
+};
 
 export const auth = betterAuth({
-  database: db,
+  ...getDatabaseConfig(),
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.NODE_ENV === "production" 
     ? process.env.NEXT_PUBLIC_APP_URL 
@@ -73,10 +91,6 @@ export const auth = betterAuth({
       enabled: true,
     },
     changeEmail: {
-      enabled: true,
-      requireEmailVerification: false,
-    },
-    changePassword: {
       enabled: true,
     },
   },
