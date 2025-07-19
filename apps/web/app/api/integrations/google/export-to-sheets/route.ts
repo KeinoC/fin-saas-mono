@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 // import { googleAPIService } from '@lib/services/google-api';
 import { auth } from '@lib/auth';
-import { googleIntegrationsStore } from '@lib/stores/google-integrations-store';
+import { GoogleIntegrationsService } from 'database/lib/google-integrations-service';
 
 // Temporary stub for build
 const googleAPIService = {
@@ -13,23 +13,9 @@ const googleAPIService = {
 
 export async function POST(request: NextRequest) {
   try {
-    // For development, skip auth check if database is not available
-    let session = null;
-    try {
-      session = await auth.api.getSession({
-        headers: request.headers,
-      });
-    } catch (authError) {
-      console.warn('Auth check failed, using mock session for development:', authError);
-      // Mock session for development
-      session = {
-        user: {
-          id: 'dev-user-123',
-          email: 'dev@example.com',
-          name: 'Development User'
-        }
-      };
-    }
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -44,8 +30,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Get the integration from temporary store
-    const integration = googleIntegrationsStore.findById(integrationId);
+    // Get the integration from database
+    const integration = await GoogleIntegrationsService.getDecryptedIntegration(integrationId);
 
     if (!integration || !integration.isActive) {
       return NextResponse.json(
@@ -54,8 +40,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Add org membership check when user management is implemented
-    // For now, allowing any authenticated user to use any integration
+    // Check if user has access to this integration's organization
+    const isMember = await GoogleIntegrationsService.checkOrgMembership(session.user.id, integration.orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
     // Add metadata to the sheet
     const sheetData = [
@@ -90,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update integration last used timestamp
-    googleIntegrationsStore.update(integrationId, { lastUsedAt: new Date() });
+    await GoogleIntegrationsService.updateLastUsed(integrationId);
 
     // Log the export activity (console for now)
     console.log('Export activity:', {
@@ -159,23 +148,9 @@ async function shareSpreadsheetWithOrg(integration: any, spreadsheetId: string) 
 // GET endpoint to retrieve available integrations for the user's organizations
 export async function GET(request: NextRequest) {
   try {
-    // For development, skip auth check if database is not available
-    let session = null;
-    try {
-      session = await auth.api.getSession({
-        headers: request.headers,
-      });
-    } catch (authError) {
-      console.warn('Auth check failed, using mock session for development:', authError);
-      // Mock session for development
-      session = {
-        user: {
-          id: 'dev-user-123',
-          email: 'dev@example.com',
-          name: 'Development User'
-        }
-      };
-    }
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -188,21 +163,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Organization ID required' }, { status: 400 });
     }
 
-    // Get integrations for the organization from temporary store
-    // TODO: Add org membership check when user management is implemented
-    
-    const integrations = googleIntegrationsStore.findByOrg(orgId)
-      .map(integration => ({
-        id: integration.id,
-        authMethod: integration.authMethod,
-        name: integration.name,
-        email: integration.email,
-        scopes: integration.scopes,
-        lastUsedAt: integration.lastUsedAt,
-        createdAt: integration.createdAt,
-      }));
+    // Check if user is member of the organization
+    const isMember = await GoogleIntegrationsService.checkOrgMembership(session.user.id, orgId);
+    if (!isMember) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
-    return NextResponse.json({ integrations });
+    // Get integrations for the organization from database
+    const integrations = await GoogleIntegrationsService.getUsableIntegrations(session.user.id, orgId);
+    
+    const formattedIntegrations = integrations.map(integration => ({
+      id: integration.id,
+      authMethod: integration.authMethod,
+      name: integration.name,
+      email: integration.email,
+      scopes: integration.scopes,
+      lastUsedAt: integration.lastUsedAt,
+      createdAt: integration.createdAt,
+    }));
+
+    return NextResponse.json({ integrations: formattedIntegrations });
 
   } catch (error) {
     console.error('Failed to fetch Google integrations:', error);

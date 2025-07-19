@@ -12,8 +12,8 @@ async function getAcuityIntegrationsService() {
 
 async function getGoogleIntegrationsService() {
   try {
-    const { googleIntegrationsService } = await import('database/lib/google-integrations-service');
-    return googleIntegrationsService;
+    const { GoogleIntegrationsService } = await import('database/lib/google-integrations-service');
+    return GoogleIntegrationsService;
   } catch (error) {
     console.warn('Google service not available:', error);
     return null;

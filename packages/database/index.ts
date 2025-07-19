@@ -3,4 +3,5 @@ export type { Prisma, NotificationMethod, Frequency } from '@prisma/client'
 
 export * from './lib/client'
 export * from './lib/types'
-export * from './lib/service' 
+export * from './lib/service'
+export * from './lib/google-integrations-service' 

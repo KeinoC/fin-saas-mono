@@ -1,8 +1,8 @@
 import { prisma } from './client';
-// import { any } from '@prisma/client';
+import { GoogleIntegration } from '@prisma/client';
 import { encrypt, decrypt } from './encryption';
 
-export interface CreateanyData {
+export interface CreateGoogleIntegrationData {
   orgId: string;
   userId?: string;
   authMethod: 'oauth' | 'service_account';
@@ -21,9 +21,15 @@ export interface CreateanyData {
   credentials?: object;
 }
 
-export class anysService {
+export interface GoogleIntegrationWithDecrypted extends GoogleIntegration {
+  decryptedAccessToken?: string;
+  decryptedRefreshToken?: string;
+  decryptedCredentials?: any;
+}
+
+export class GoogleIntegrationsService {
   
-  async create(data: CreateanyData): Promise<any> {
+  static async create(data: CreateGoogleIntegrationData): Promise<GoogleIntegration> {
     const {
       orgId,
       userId,
@@ -64,13 +70,13 @@ export class anysService {
     return integration;
   }
 
-  async findById(id: string): Promise<any | null> {
+  static async findById(id: string): Promise<GoogleIntegration | null> {
     return prisma.googleIntegration.findUnique({
       where: { id, isActive: true },
     });
   }
 
-  async findByOrg(orgId: string): Promise<any[]> {
+  static async findByOrg(orgId: string): Promise<GoogleIntegration[]> {
     return prisma.googleIntegration.findMany({
       where: { 
         orgId,
@@ -80,10 +86,22 @@ export class anysService {
     });
   }
 
-  async findByOrgAndMethod(
+  static async findByUserAndOrg(userId: string, orgId: string): Promise<GoogleIntegration | null> {
+    return prisma.googleIntegration.findFirst({
+      where: { 
+        userId,
+        orgId,
+        authMethod: 'oauth',
+        isActive: true 
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  static async findByOrgAndMethod(
     orgId: string, 
     authMethod: 'oauth' | 'service_account'
-  ): Promise<any[]> {
+  ): Promise<GoogleIntegration[]> {
     return prisma.googleIntegration.findMany({
       where: { 
         orgId,
@@ -94,19 +112,19 @@ export class anysService {
     });
   }
 
-  async updateLastUsed(id: string): Promise<any | null> {
+  static async updateLastUsed(id: string): Promise<GoogleIntegration | null> {
     return prisma.googleIntegration.update({
       where: { id },
       data: { lastUsedAt: new Date() },
     });
   }
 
-  async updateTokens(
+  static async updateTokens(
     id: string, 
     accessToken: string, 
     refreshToken?: string,
     expiryDate?: Date
-  ): Promise<any | null> {
+  ): Promise<GoogleIntegration | null> {
     const encryptedAccessToken = await encrypt(accessToken);
     const encryptedRefreshToken = refreshToken ? await encrypt(refreshToken) : undefined;
 
@@ -120,36 +138,36 @@ export class anysService {
     });
   }
 
-  async deactivate(id: string): Promise<any | null> {
+  static async deactivate(id: string): Promise<GoogleIntegration | null> {
     return prisma.googleIntegration.update({
       where: { id },
       data: { isActive: false },
     });
   }
 
-  async delete(id: string): Promise<void> {
+  static async delete(id: string): Promise<void> {
     await prisma.googleIntegration.delete({
       where: { id },
     });
   }
 
   // Get decrypted credentials for use in Google API calls
-  async getDecryptedIntegration(id: string): Promise<any | null> {
+  static async getDecryptedIntegration(id: string): Promise<GoogleIntegrationWithDecrypted | null> {
     const integration = await this.findById(id);
     if (!integration) return null;
 
-    const decrypted = {
+    const decrypted: GoogleIntegrationWithDecrypted = {
       ...integration,
-      accessToken: integration.accessToken ? await decrypt(integration.accessToken) : null,
-      refreshToken: integration.refreshToken ? await decrypt(integration.refreshToken) : null,
-      credentials: integration.credentials ? JSON.parse(await decrypt(integration.credentials)) : null,
+      decryptedAccessToken: integration.accessToken ? await decrypt(integration.accessToken) : undefined,
+      decryptedRefreshToken: integration.refreshToken ? await decrypt(integration.refreshToken) : undefined,
+      decryptedCredentials: integration.credentials ? JSON.parse(await decrypt(integration.credentials)) : undefined,
     };
 
     return decrypted;
   }
 
   // Check if user has admin access to organization
-  async checkAdminAccess(userId: string, orgId: string): Promise<boolean> {
+  static async checkAdminAccess(userId: string, orgId: string): Promise<boolean> {
     const orgUser = await prisma.organizationUser.findUnique({
       where: {
         userId_orgId: { userId, orgId }
@@ -160,7 +178,7 @@ export class anysService {
   }
 
   // Check if user is member of organization
-  async checkOrgMembership(userId: string, orgId: string): Promise<boolean> {
+  static async checkOrgMembership(userId: string, orgId: string): Promise<boolean> {
     const orgUser = await prisma.organizationUser.findUnique({
       where: {
         userId_orgId: { userId, orgId }
@@ -171,12 +189,35 @@ export class anysService {
   }
 
   // Get integrations that user can use (admin integrations for their orgs)
-  async getUsableIntegrations(userId: string, orgId: string): Promise<any[]> {
+  static async getUsableIntegrations(userId: string, orgId: string): Promise<GoogleIntegration[]> {
     const isMember = await this.checkOrgMembership(userId, orgId);
     if (!isMember) return [];
 
     return this.findByOrg(orgId);
   }
-}
 
-export const googleIntegrationsService = new anysService(); 
+  // Create or update Google OAuth integration from Better Auth callback
+  static async saveOAuthIntegration({
+    userId,
+    orgId,
+    googleAccount
+  }: {
+    userId: string;
+    orgId: string;
+    googleAccount: any;
+  }): Promise<GoogleIntegration> {
+    return this.create({
+      userId,
+      orgId,
+      authMethod: 'oauth',
+      name: `Google OAuth (${googleAccount.email || 'Unknown'})`,
+      email: googleAccount.email || '',
+      scopes: googleAccount.scope?.split(' ') || [],
+      accessToken: googleAccount.access_token,
+      refreshToken: googleAccount.refresh_token,
+      scope: googleAccount.scope,
+      tokenType: googleAccount.token_type,
+      expiryDate: googleAccount.expires_at ? new Date(googleAccount.expires_at * 1000) : undefined
+    });
+  }
+} 

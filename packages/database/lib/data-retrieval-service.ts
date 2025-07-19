@@ -1,7 +1,7 @@
 import { prisma } from './client';
 // import { any, any, string } from '@prisma/client';
 import { acuityIntegrationsService } from './acuity-integrations-service';
-import { googleIntegrationsService } from './google-integrations-service';
+import { GoogleIntegrationsService } from './google-integrations-service';
 
 // Standardized data format that all retrieval operations return
 export interface RetrievedData {
@@ -187,7 +187,7 @@ export class DataRetrievalService {
       });
 
     if (googleIntegration) {
-      const decryptedIntegration = await googleIntegrationsService.getDecryptedIntegration(googleIntegration.id);
+      const decryptedIntegration = await GoogleIntegrationsService.getDecryptedIntegration(googleIntegration.id);
       return {
         ...googleIntegration,
         credentials: decryptedIntegration,
@@ -214,8 +214,8 @@ export class DataRetrievalService {
       })));
 
       // Get Google integrations
-      const googleIntegrations = await googleIntegrationsService.findByOrg(orgId);
-      integrations.push(...googleIntegrations.map(gi => ({
+      const googleIntegrations = await GoogleIntegrationsService.findByOrg(orgId);
+      integrations.push(...googleIntegrations.map((gi: any) => ({
         id: gi.id,
         source: 'google' as const,
         name: gi.name

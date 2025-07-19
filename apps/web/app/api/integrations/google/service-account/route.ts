@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 // import { googleAPIService, GoogleServiceAccountCredentials } from '@lib/services/google-api';
 import { auth } from '@lib/auth';
-import { googleIntegrationsService } from 'database/lib/google-integrations-service';
+import { GoogleIntegrationsService } from 'database/lib/google-integrations-service';
 
 // Temporary stub for build
 type GoogleServiceAccountCredentials = any;
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is admin of the organization
-    const isAdmin = await googleIntegrationsService.checkAdminAccess(session.user.id, orgId);
+    const isAdmin = await GoogleIntegrationsService.checkAdminAccess(session.user.id, orgId);
     if (!isAdmin) {
       return NextResponse.json({ 
         error: 'Insufficient permissions. Admin access required.' 
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store in database with encryption
-    const integration = await googleIntegrationsService.create({
+    const integration = await GoogleIntegrationsService.create({
       orgId,
       userId: session.user.id, // Admin who set it up
       authMethod: 'service_account',
@@ -119,13 +119,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Check org membership
-    const isMember = await googleIntegrationsService.checkOrgMembership(session.user.id, orgId);
+    const isMember = await GoogleIntegrationsService.checkOrgMembership(session.user.id, orgId);
     if (!isMember) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     // Get service account integrations for the organization
-    const integrations = await googleIntegrationsService.findByOrgAndMethod(orgId, 'service_account');
+    const integrations = await GoogleIntegrationsService.findByOrgAndMethod(orgId, 'service_account');
 
     return NextResponse.json({ integrations });
 

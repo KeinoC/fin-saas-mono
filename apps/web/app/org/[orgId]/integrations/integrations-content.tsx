@@ -1,7 +1,7 @@
 'use client';
 
 import { IntegrationConnector } from '@/features/integrations/components/integration-connector';
-import { GoogleIntegrationBetterAuth } from '@/features/integrations/components/google-integration-betterauth';
+// import { GoogleIntegrationBetterAuth } from '@/features/integrations/components/google-integration-betterauth';
 
 interface IntegrationsContentProps {
   orgId: string;
@@ -22,15 +22,15 @@ export function IntegrationsContent({ orgId }: IntegrationsContentProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* Better Auth Google Integration */}
-          <div>
+          {/* Better Auth Google Integration - Temporarily disabled */}
+          {/* <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Google Services</h2>
             <GoogleIntegrationBetterAuth orgId={orgId} />
-          </div>
+          </div> */}
           
           {/* Other Integrations */}
           <div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">Other Integrations</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Integrations</h2>
             <IntegrationConnector orgId={orgId} />
           </div>
         </div>

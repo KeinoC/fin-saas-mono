@@ -129,7 +129,8 @@ export function LoginForm() {
         )}
 
         <div className="space-y-4">
-          <button
+          {/* Google OAuth temporarily disabled - OAuth client configuration needed */}
+          {/* <button
             onClick={() => handleSocialLogin('google')}
             disabled={isLoading}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-600 rounded-lg bg-white text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:opacity-50"
@@ -162,7 +163,7 @@ export function LoginForm() {
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">Or continue with email</span>
             </div>
-          </div>
+          </div> */}
 
           <form onSubmit={handleEmailPasswordAuth} className="space-y-4">
             <div>
