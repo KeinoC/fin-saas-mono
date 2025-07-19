@@ -1,6 +1,7 @@
 'use client';
 
 import { IntegrationConnector } from '@/features/integrations/components/integration-connector';
+import { AcuityOAuthIntegration } from '@/features/integrations/components/acuity-oauth-integration';
 // import { GoogleIntegrationBetterAuth } from '@/features/integrations/components/google-integration-betterauth';
 
 interface IntegrationsContentProps {
@@ -28,9 +29,15 @@ export function IntegrationsContent({ orgId }: IntegrationsContentProps) {
             <GoogleIntegrationBetterAuth orgId={orgId} />
           </div> */}
           
+          {/* Acuity OAuth Integration */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Acuity Scheduling OAuth</h2>
+            <AcuityOAuthIntegration orgId={orgId} isAdmin={true} />
+          </div>
+          
           {/* Other Integrations */}
           <div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">Integrations</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Other Integrations</h2>
             <IntegrationConnector orgId={orgId} />
           </div>
         </div>

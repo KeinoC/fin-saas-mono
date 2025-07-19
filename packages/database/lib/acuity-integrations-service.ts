@@ -10,6 +10,17 @@ export interface CreateAcuityIntegrationData {
   name?: string;
 }
 
+export interface CreateAcuityOAuthData {
+  orgId: string;
+  userId: string;
+  acuityUserId: string;
+  accessToken: string;
+  scope: string;
+  tokenType: string;
+  name: string;
+  email: string;
+}
+
 export class AcuityIntegrationsService {
   
   async create(data: CreateAcuityIntegrationData): Promise<any> {
@@ -84,12 +95,89 @@ export class AcuityIntegrationsService {
     });
   }
 
+  async createOAuth(data: CreateAcuityOAuthData): Promise<any> {
+    const {
+      orgId,
+      userId,
+      acuityUserId,
+      accessToken,
+      scope,
+      tokenType,
+      name,
+      email
+    } = data;
+
+    // Encrypt the access token
+    const encryptedAccessToken = await encrypt(accessToken);
+
+    // Check if OAuth integration already exists
+    const existingIntegration = await prisma.account.findFirst({
+      where: {
+        orgId,
+        source: 'acuity',
+        userId,
+        externalAccountId: acuityUserId
+      }
+    });
+
+    if (existingIntegration) {
+      // Update existing OAuth integration
+      return prisma.account.update({
+        where: {
+          id: existingIntegration.id
+        },
+        data: {
+          accessToken: encryptedAccessToken,
+          scope,
+          tokenType,
+          displayName: name,
+          lastSyncedAt: new Date(),
+        },
+      });
+    }
+
+    // Create new OAuth integration
+    const integration = await prisma.account.create({
+      data: {
+        orgId,
+        userId,
+        source: 'acuity',
+        accessToken: encryptedAccessToken,
+        externalAccountId: acuityUserId,
+        scope,
+        tokenType,
+        displayName: name,
+        lastSyncedAt: new Date(),
+      },
+    });
+
+    return integration;
+  }
+
+  async findByUserAndOrgOAuth(userId: string, orgId: string): Promise<any | null> {
+    return prisma.account.findFirst({
+      where: {
+        userId,
+        orgId,
+        source: 'acuity',
+        // OAuth integrations have tokenType set
+        tokenType: { not: null }
+      },
+    });
+  }
+
   async delete(orgId: string): Promise<void> {
     await prisma.account.deleteMany({
       where: {
         orgId,
         source: 'acuity'
       }
+    });
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await prisma.account.delete({
+      where: { id }
     });
   }
 
